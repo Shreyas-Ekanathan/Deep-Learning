@@ -1,0 +1,1 @@
+#this file will use linear algebra to analytically solve for the best fit line of a set of data points
