@@ -7,8 +7,8 @@ def generate_data():
     x_vals = np.zeros((10000, 64))
     y_vals = np.zeros(10000)
     for i in range(10000):
-        x = np.random.uniform(-12049109402.4, 04192091049.4, 64)
-        y = np.dot(x, slopes) + intercept + np.random.uniform(-0.001, 0.001)
+        x = np.random.uniform(-1.0, 1.0, 64) #this is why we normalize! gradients blew up with bigger x values
+        y = np.dot(x, slopes) + intercept + np.random.uniform(-0.1, 0.1)
         x_vals[i] = x
         y_vals[i] = y
     return x_vals, y_vals, slopes, intercept
@@ -27,12 +27,10 @@ class model:
         
 m = model()
 
-for i in range(10): #1000 training epochs
+for i in range(1000): #1000 training epochs
     y = augmented_x @ m.weights
     residual = y - data_y
-    print(residual)
     update = 1/10000 * (xT @ residual)
-    print(update)
     m.weights = m.weights - update
     
 weights_post_training = m.weights
