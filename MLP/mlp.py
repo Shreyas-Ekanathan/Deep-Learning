@@ -24,12 +24,36 @@ class model:
         return np.maximum(0, y)    
     
     def forward_pass(self, X):
-        out1 = X @ self.hidden1 + self.b1 #output is 100x256
-        activated1 = self.relu(out1)
-        out2 = activated1 @ self.hidden2 + self.b2 #output is 100x32
-        activated2 = self.relu(out2) 
-        y = activated2 @ self.hidden3 + self.b3 #100x1, 1 output per each of the hundrend inputs 
+        out1 = X @ self.hidden1 + self.b1 #output is 100x256, this is y1
+        activated1 = self.relu(out1) #z1, 100x256
+        out2 = activated1 @ self.hidden2 + self.b2 #output is 100x32, y2
+        activated2 = self.relu(out2) # z2, 100x32
+        y = activated2 @ self.hidden3 + self.b3 #100x1, 1 output per each of the hundred inputs, this is out
         return y
+    
+    def MSE_loss(self, prediction, target):
+        return 0.5/100 * np.linalg.norm(target - prediction) ** 2
+    
+    def backprop_updates(self, x, y1, z1, y2, z2, prediction, target, learning_rate):
+        p_bar = prediction - target #100x1
+        w3_bar = z2.T @ p_bar #32x1
+        b3_bar = p_bar #100x1
+        z2_bar = self.hidden3 #32x1
+        y2_bar = 0 if  y2 < 0 else z2_bar #32x1
+        w2_bar = z1.T * y2_bar #should be 256x32, is 100x256 * 32x100
+        b2_bar = y2_bar
+        z1_bar = self.hidden2
+        y1_bar = 0 if y1 < 0 else z1_bar
+        w1_bar = x * y1_bar
+        b1_bar = y1_bar
+        
+        self.hidden3 = self.hidden3 - learning_rate * w3_bar
+        self.b3 = self.b3 - learning_rate * b3_bar
+        self.hidden2 = self.hidden2 - learning_rate * w2_bar
+        self.b2 = self.b2 - learning_rate * b2_bar
+        self.hidden1 = self.hidden1 - learning_rate * w1_bar
+        self.b1 = self.b1 - learning_rate * b1_bar
+         
 
 X = np.zeros((100, 64))
 
