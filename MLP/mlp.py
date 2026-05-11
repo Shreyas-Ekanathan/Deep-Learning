@@ -9,7 +9,26 @@ import numpy as np
 # we will also batch inputs for demonstration, take a random batch repeatedly and then also store a test batch to compare against
 
 def generate_data():
-    return 0
+    training_set_in = np.zeros((10000, 64))
+    test_set_in = np.zeros((1000, 64))
+    training_set_out = np.zeros(10000)
+    test_set_out = np.zeros(1000)
+    for i in range(10000):
+        x = np.random.uniform(0.005, 1.0, 64)
+        y = np.sum(x * np.log(x))
+        training_set_in[i] = x
+        training_set_out[i] = y
+        
+    for i in range(1000):
+        x = np.random.uniform(-1.0, 1.0, 64)
+        y = np.sum(x * np.log(x))
+        test_set_in[i] = x
+        test_set_out[i] = y
+    return training_set_in, training_set_out, test_set_in, test_set_out
+
+def get_batch(input, output, batch_size):
+    target = np.random.randint(1, 10000 - batch_size)
+    return input[target : target + batch_size - 1], output[target : target + batch_size - 1]
 
 batch_size = 100
 
@@ -31,12 +50,11 @@ class model:
         out2 = activated1 @ self.hidden2 + self.b2 #output is 100x32, y2
         activated2 = self.relu(out2) # z2, 100x32
         y = activated2 @ self.hidden3 + self.b3 #100x1, 1 output per each of the hundred inputs, this is out
-        return y
+        return out1, activated1, out2, activated2, y
     
     def MSE_loss(self, prediction, target):
         return 0.5/batch_size * np.linalg.norm(target - prediction) ** 2
     
-    #TODO: add a batchprop variable isntead of passing hardcoded numbers
     def backprop_updates(self, x, y1, z1, y2, z2, prediction, target, learning_rate):
         p_bar = (prediction - target) / batch_size #100x1
         w3_bar = z2.T @ p_bar #32x1
@@ -58,6 +76,15 @@ class model:
         self.b1 = self.b1 - learning_rate * b1_bar
          
 
-X = np.zeros((batch_size, 64))
+train_set_input, training_set_output, test_set_input, test_set_output = generate_data()
+m = model()
 
-
+learning_rate = 0.1
+for i in range(500): #500 training epochs
+    batch, target = get_batch(train_set_input, training_set_output, batch_size)
+    y1, z1, y2, z2, prediction = m.forward_pass(batch)
+    m.backprop_updates(batch, y1, z1, y2, z2, prediction, target, learning_rate)
+    if (i % 50 == 0):
+        #evaluate on test set
+        y1, z1, y2, z2, prediction = m.forward_pass(test_set_input)
+        print("loss: ", m.MSE_loss(prediction, test_set_output))
