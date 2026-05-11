@@ -11,6 +11,8 @@ import numpy as np
 def generate_data():
     return 0
 
+batch_size = 100
+
 class model:
     def __init__(self):
         self.hidden1 = np.zeros((64, 256))
@@ -32,20 +34,21 @@ class model:
         return y
     
     def MSE_loss(self, prediction, target):
-        return 0.5/100 * np.linalg.norm(target - prediction) ** 2
+        return 0.5/batch_size * np.linalg.norm(target - prediction) ** 2
     
+    #TODO: add a batchprop variable isntead of passing hardcoded numbers
     def backprop_updates(self, x, y1, z1, y2, z2, prediction, target, learning_rate):
-        p_bar = prediction - target #100x1
+        p_bar = (prediction - target) / batch_size #100x1
         w3_bar = z2.T @ p_bar #32x1
-        b3_bar = p_bar #100x1
-        z2_bar = self.hidden3 #32x1
-        y2_bar = 0 if  y2 < 0 else z2_bar #32x1
-        w2_bar = z1.T * y2_bar #should be 256x32, is 100x256 * 32x100
-        b2_bar = y2_bar
-        z1_bar = self.hidden2
-        y1_bar = 0 if y1 < 0 else z1_bar
-        w1_bar = x * y1_bar
-        b1_bar = y1_bar
+        b3_bar = np.sum(p_bar, axis = 0) #1x1
+        z2_bar = p_bar[:, None] * self.hidden3[None, :] #100x1 * 1x32 -> 100x32
+        y2_bar = z2_bar * (y2 > 0) #100x32
+        w2_bar = z1.T @ y2_bar #should be 256x32, is 256x100 * 100x32
+        b2_bar = np.sum(y2_bar, axis = 0) #32x1
+        z1_bar = y2_bar @ self.hidden2.T # 100x32 * 32x256 -> 100x256
+        y1_bar = z1_bar * (y1 > 0) #100x256
+        w1_bar = x.T @ y1_bar #64x100 * 100x256 -> 64x256
+        b1_bar = np.sum(y1_bar, axis = 0) #256x1
         
         self.hidden3 = self.hidden3 - learning_rate * w3_bar
         self.b3 = self.b3 - learning_rate * b3_bar
@@ -55,6 +58,6 @@ class model:
         self.b1 = self.b1 - learning_rate * b1_bar
          
 
-X = np.zeros((100, 64))
+X = np.zeros((batch_size, 64))
 
 
