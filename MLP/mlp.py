@@ -8,6 +8,7 @@ import numpy as np
 #let's use relu to activate each just for demonstration
 # we will also batch inputs for demonstration, take a random batch repeatedly and then also store a test batch to compare against
 
+#result: model learns shannon entropy!
 def generate_data(training_size):
     training_set_in = np.zeros((training_size, 64))
     test_set_in = np.zeros((1000, 64))
