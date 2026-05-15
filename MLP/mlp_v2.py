@@ -61,11 +61,18 @@ class model:
         return exp_y / np.sum(exp_y)    
     
     def batch_normalize(y):
-        mu = np.mean(y, axis=0, keepdims=True)
-        sigma2 = np.var(y, axis=0, keepdims=True)
+        mu = np.mean(y, axis = 0, keepdims = True) #1 x 32
+        sigma2 = np.var(y, axis = 0, keepdims = True) #1 x 32
         y_norm = (y - mu) / np.sqrt(sigma2 + 1e-12)
         return y_norm, mu, sigma2
     
+    def batch_norm_backprop(y, mu, sigma2, upstream_derivative):
+        sigma_hat = np.sqrt(sigma2 + 1e-12)
+        p1 = batch_size * upstream_derivative
+        p2 = np.sum(upstream_derivative, axis = 0, keepdims = True)
+        p3 = y * np.sum(upstream_derivative * y, axis = 0, keepdims = True)
+        return (p1 + p2 + p3) / (batch_size * sigma_hat) #we really need to learn matrix calc properly
+
     def forward_pass(self, input_batch):
         y1 = input_batch @ self.w1 + self.b1 #batch_size x 128
         norm1, mu1, sigma2_1 = self.batch_normalize(y1)
@@ -79,7 +86,8 @@ class model:
         prediction = self.softmax(y3)
         return y1, norm1, mu1, sigma2_1, norm1_scaled, z1, y2, norm2, mu2, sigma2_2, norm2_scaled, z2, y3, prediction
             
-    def backprop(self, input_batch, y1, norm1, norm1_scaled, z1, y2, norm2, norm2_scaled, z2, y3, prediction, target):
+    def backprop(self, input_batch, y1, norm1, mu1, sigma2_1, norm1_scaled, z1, 
+                 y2, norm2, mu2, sigma2_2, norm2_scaled, z2, y3, prediction, target):
         y3_bar = (prediction - target) / batch_size #batch_size x 10
         w3_bar = z2.T @ y3_bar #32xbatch_size * batch_size x 10 -> 32x10
         b3_bar = np.sum(y3_bar, axis=0)
@@ -89,7 +97,9 @@ class model:
         norm2_scaled_bar = z2_bar * (norm2_scaled > 0)
         gamma2_bar = np.sum(norm2 * norm2_scaled_bar, axis = 0) # vector of length 32
         beta2_bar = np.sum(norm2_scaled_bar, axis = 0) #len 32
-        norm2_bar = self.gamma2 * norm2_scaled_bar
+        norm2_bar = self.gamma2 * norm2_scaled_bar #batch_size x 32
+        y2_bar = self.batch_norm_backprop(norm2, mu2, sigma2_2, norm2_bar)
+        
         return 0
     
     def adam(self, beta1, beta2, beta3, gamma1, gamma2, gamma3, alpha):
