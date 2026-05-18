@@ -14,6 +14,19 @@
 
 import numpy as np
 
+def generate_data():
+    #TODO
+    return 0
+
+def get_batch(input, output, batch_size):
+    indices = [np.random.randint(1, 10000 - batch_size) for _ in range (batch_size)]
+    batch_input = np.zeros((batch_size, 64))
+    batch_output = np.zeros(batch_size)
+    for i in range(batch_size):
+        batch_input[i] = input[indices[i]]
+        batch_output[i] = output[indices[i]]
+    return batch_input, batch_output
+
 class model: 
     def __init__(self):
         #TODO: implement an actual initialization scheme
@@ -76,7 +89,7 @@ class model:
     def forward_pass(self, input_batch):
         y1 = input_batch @ self.w1 + self.b1 #batch_size x 128
         norm1, mu1, sigma2_1 = self.batch_normalize(y1)
-        norm1_scaled = self.gamma1 * norm1 + self.beta1
+        norm1_scaled = self.gamma1 * norm1 + self.beta1 #batch_size x 128
         z1 = self.relu(norm1_scaled) # batch_size x 128
         y2 = z1 @ self.w2 + self.b2 # batch_size x 32
         norm2, mu2, sigma2_2 = self.batch_normalize(y2)
@@ -90,7 +103,7 @@ class model:
                  y2, norm2, mu2, sigma2_2, norm2_scaled, z2, y3, prediction, target):
         y3_bar = (prediction - target) / batch_size #batch_size x 10
         w3_bar = z2.T @ y3_bar #32xbatch_size * batch_size x 10 -> 32x10
-        b3_bar = np.sum(y3_bar, axis=0)
+        b3_bar = np.sum(y3_bar, axis = 0)
         w3_v_update = w3_bar ** 2
         b3_v_update = b3_bar ** 2
         z2_bar = y3_bar @ self.w3.T # batch_sizex10 * 10x32 -> batch_size x 32
@@ -98,28 +111,44 @@ class model:
         gamma2_bar = np.sum(norm2 * norm2_scaled_bar, axis = 0) # vector of length 32
         beta2_bar = np.sum(norm2_scaled_bar, axis = 0) #len 32
         norm2_bar = self.gamma2 * norm2_scaled_bar #batch_size x 32
-        y2_bar = self.batch_norm_backprop(norm2, mu2, sigma2_2, norm2_bar)
-        
-        return 0
+        y2_bar = self.batch_norm_backprop(norm2, mu2, sigma2_2, norm2_bar) #batch_size x 32
+        w2_bar = z1.T @ y2_bar #128x32
+        b2_bar = np.sum(y2_bar, axis = 0) #1x32
+        w2_v_update = w2_bar ** 2
+        b2_v_update = b2_bar ** 2
+        z1_bar = y2_bar @ self.w2.T #batch_size x 128
+        norm1_scaled_bar = z1_bar * (norm1_scaled > 0) #batch_size x 128
+        gamma1_bar = np.sum(norm1 * norm1_scaled_bar, axis = 0) #1x128
+        beta1_bar = np.sum(norm2_scaled_bar, axis = 0) #1x128
+        norm1_bar = self.gamma1 * norm1_scaled_bar
+        y1_bar = self.batch_norm_backprop(norm1, mu1, sigma2_1, norm1_bar)
+        w1_bar = input_batch.T @ y1_bar
+        b1_bar = np.sum(y1_bar, axis = 0) 
+        w1_v_update = w1_bar ** 2
+        b1_v_update = b1_bar ** 2
+
+        return (w1_bar, b1_bar, w2_bar, b2_bar, w3_bar, b3_bar, 
+                w1_v_update, b1_v_update, w2_v_update, b2_v_update, w3_v_update, b3_v_update,
+                gamma1_bar, gamma2_bar, beta1_bar, beta2_bar)
     
-    def adam(self, beta1, beta2, beta3, gamma1, gamma2, gamma3, alpha):
+    def adam(self, input_batch, y1, norm1, mu1, sigma2_1, norm1_scaled, z1, y2, norm2, mu2, sigma2_2, norm2_scaled, z2, y3, prediction, target, beta, gamma, alpha):
         #set desired updates with momentum
         (w1_m_update, b1_m_update, w2_m_update, b2_m_update, w3_m_update, b3_m_update, 
          w1_v_update, b1_v_update, w2_v_update, b2_v_update, w3_v_update, b3_v_update,
-         gamma1_update, gamma2_update, beta1_update, beta2_update) = self.backprop()
-        self.w1_m = beta1 * self.w1_m + (1 - beta1) * w1_m_update
-        self.b1_m = beta1 * self.b1_m + (1 - beta1) * b1_m_update
-        self.w2_m = beta2 * self.w2_m + (1 - beta2) * w2_m_update
-        self.b2_m = beta2 * self.b2_m + (1 - beta2) * b2_m_update
-        self.w3_m = beta3 * self.w3_m + (1 - beta3) * w3_m_update
-        self.b3_m = beta3 * self.b3_m + (1 - beta3) * b3_m_update
+         gamma1_update, gamma2_update, beta1_update, beta2_update) = self.backprop(input_batch, y1, norm1, mu1, sigma2_1, norm1_scaled, z1, y2, norm2, mu2, sigma2_2, norm2_scaled, z2, y3, prediction, target)
+        self.w1_m = beta * self.w1_m + (1 - beta) * w1_m_update
+        self.b1_m = beta * self.b1_m + (1 - beta) * b1_m_update
+        self.w2_m = beta * self.w2_m + (1 - beta) * w2_m_update
+        self.b2_m = beta * self.b2_m + (1 - beta) * b2_m_update
+        self.w3_m = beta * self.w3_m + (1 - beta) * w3_m_update
+        self.b3_m = beta * self.b3_m + (1 - beta) * b3_m_update
         
-        self.w1_v = gamma1 * self.w1_v + (1 - gamma1) * w1_v_update
-        self.b1_v = gamma1 * self.b1_v + (1 - gamma1) * b1_v_update
-        self.w2_v = gamma2 * self.w2_v + (1 - gamma2) * w2_v_update
-        self.b2_v = gamma2 * self.b2_v + (1 - gamma2) * b2_v_update
-        self.w3_v = gamma3 * self.w3_v + (1 - gamma3) * w3_v_update
-        self.b3_v = gamma3 * self.b3_v + (1 - gamma3) * b3_v_update
+        self.w1_v = gamma * self.w1_v + (1 - gamma) * w1_v_update
+        self.b1_v = gamma * self.b1_v + (1 - gamma) * b1_v_update
+        self.w2_v = gamma * self.w2_v + (1 - gamma) * w2_v_update
+        self.b2_v = gamma * self.b2_v + (1 - gamma) * b2_v_update
+        self.w3_v = gamma * self.w3_v + (1 - gamma) * w3_v_update
+        self.b3_v = gamma * self.b3_v + (1 - gamma) * b3_v_update
 
         #update
         self.w1 -= alpha * self.w1_m / (np.sqrt(self.w1_v) + 1e-12)
@@ -134,3 +163,16 @@ class model:
         self.beta2 -= alpha * beta2_update
 
 batch_size = 100
+train_set_input, training_set_output, test_set_input, test_set_output = generate_data(1000000)
+m = model()
+
+learning_rate = 0.1
+
+for i in range(1000): #1000 training epochs
+    batch, target = get_batch(train_set_input, training_set_output, batch_size)
+    y1, norm1, mu1, sigma2_1, norm1_scaled, z1, y2, norm2, mu2, sigma2_2, norm2_scaled, z2, y3, prediction = m.forward_pass(batch)
+    m.adam(batch, y1, norm1, mu1, sigma2_1, norm1_scaled, z1, y2, norm2, mu2, sigma2_2, norm2_scaled, z2, y3, prediction, target, 0.05, 0.05)
+    if (i % 50 == 0):
+        #evaluate on test set
+        y1, z1, y2, z2, prediction = m.forward_pass(test_set_input)
+        print("loss: ", m.MSE_loss(prediction, test_set_output, 1000))
