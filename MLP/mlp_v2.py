@@ -17,21 +17,22 @@ import numpy as np
 def generate_data(N):
     D = 3
     K = 10
-    X = np.zeros((N*K, D))
-    y = np.zeros(N*K, dtype='uint8')
+    n = int(N / K)
+    X = np.zeros((n*K, D))
+    y = np.zeros(n*K, dtype='uint8')
     for j in range(K):
-        ix = range(N*j, N*(j+1))
-        r = np.linspace(0.0, 1, N)
-        t = np.linspace(j*4, (j+1)*4, N) + np.random.randn(N)*0.2   # azimuthal angle
-        phi = np.linspace(j*np.pi/K, (j+1)*np.pi/K, N) + np.random.randn(N)*0.1  # polar angle
+        ix = range(n*j, n*(j+1))
+        r = np.linspace(0.0, 1, n)
+        t = np.linspace(j*4, (j+1)*4, n) + np.random.randn(n)*0.2 # azimuthal angle
+        phi = np.linspace(j*np.pi/K, (j+1)*np.pi/K, n) + np.random.randn(n)*0.1 # polar angle
         X[ix] = np.c_[
-            r*np.sin(phi)*np.cos(t) + np.random.uniform(-1.0, 1.0, size=N),
-            r*np.sin(phi)*np.sin(t) + np.random.uniform(-1.0, 1.0, size=N),
-            r*np.cos(phi) + np.random.uniform(-1.0, 1.0, size=N)
+            r*np.sin(phi)*np.cos(t) + np.random.uniform(-0.05, 0.05, size=n),
+            r*np.sin(phi)*np.sin(t) + np.random.uniform(-0.05, 0.05, size=n),
+            r*np.cos(phi) + np.random.uniform(-0.05, 0.05, size=n)
         ]
         y[ix] = j
-    y_onehot = np.zeros((N*K, K))
-    y_onehot[np.arange(N*K), y] = 1
+    y_onehot = np.zeros((n*K, K))
+    y_onehot[np.arange(n*K), y] = 1
     return X, y_onehot
 
 def get_batches(input, output, batch_size):
@@ -46,11 +47,11 @@ def get_batches(input, output, batch_size):
             out[j] = output[permutation[i * batch_size + j]]
         batches[i] = batch
         outputs[i] = out
-    return batches, out
+    return batches, outputs
 
 class model: 
     def __init__(self):
-        #TODO: implement an actual initialization scheme
+        #He initialization
         self.w1 = np.random.randn(3, 128) * np.sqrt(2.0 / 3)
         self.w1_m = np.zeros((3, 128))
         self.w1_v = np.zeros((3, 128))
@@ -89,12 +90,12 @@ class model:
     
     def relu(self, y):
         return np.maximum(0, y)    
-    
+         
     def softmax(self, y):
-        y_shifted = y - np.max(y)
+        y_shifted = y - np.max(y, axis=-1, keepdims=True)
         exp_y = np.exp(y_shifted)
-        return exp_y / np.sum(exp_y)    
-    
+        return exp_y / np.sum(exp_y, axis=-1, keepdims=True)
+
     def batch_normalize(self, y):
         mu = np.mean(y, axis = 0, keepdims = True) #1 x 32
         sigma2 = np.var(y, axis = 0, keepdims = True) #1 x 32
@@ -106,7 +107,7 @@ class model:
         p1 = batch_size * upstream_derivative
         p2 = np.sum(upstream_derivative, axis = 0, keepdims = True)
         p3 = y * np.sum(upstream_derivative * y, axis = 0, keepdims = True)
-        return (p1 + p2 + p3) / (batch_size * sigma_hat) #we really need to learn matrix calc properly
+        return (p1 - p2 - p3) / (batch_size * sigma_hat) #we really need to learn matrix calc properly
 
     def forward_pass(self, input_batch):
         y1 = input_batch @ self.w1 + self.b1 #batch_size x 128
@@ -191,27 +192,22 @@ train_set_input, train_set_output = generate_data(N)
 test_set_input, test_set_output = generate_data(200)
 m = model()
 
-learning_rate = 0.1
+learning_rate = 0.001
 
-for i in range(20): # 1000 training epochs
+for i in range(1000): # 1000 training epochs
     batches, targets = get_batches(train_set_input, train_set_output, batch_size) 
     # batch should be batch_size x 3
-    for i in range(num_batches):
-        y1, norm1, mu1, sigma2_1, norm1_scaled, z1, y2, norm2, mu2, sigma2_2, norm2_scaled, z2, y3, prediction = m.forward_pass(batches[i])
-        m.adam(batches[i], y1, norm1, mu1, sigma2_1, norm1_scaled, z1, y2, norm2, mu2, sigma2_2, norm2_scaled, z2, y3, prediction, targets[i], 0.05, 0.05, learning_rate)
-        if (i % 50 == 0):
-            # evaluate on test set
-            y1, norm1, mu1, sigma2_1, norm1_scaled, z1, y2, norm2, mu2, sigma2_2, norm2_scaled, z2, y3, prediction = m.forward_pass(test_set_input)
-            print("Loss: ", m.cross_entropy_loss(prediction, test_set_output))
+    for j in range(num_batches):
+        y1, norm1, mu1, sigma2_1, norm1_scaled, z1, y2, norm2, mu2, sigma2_2, norm2_scaled, z2, y3, prediction = m.forward_pass(batches[j])
+        m.adam(batches[j], y1, norm1, mu1, sigma2_1, norm1_scaled, z1, y2, norm2, mu2, sigma2_2, norm2_scaled, z2, y3, prediction, targets[j], 0.9, 0.999, learning_rate)
+    if (i % 10 == 0):
+        # evaluate on test set
+        y1, norm1, mu1, sigma2_1, norm1_scaled, z1, y2, norm2, mu2, sigma2_2, norm2_scaled, z2, y3, prediction = m.forward_pass(test_set_input)
+        print("Loss: ", m.cross_entropy_loss(prediction, test_set_output))
             
 # find the accuracy after training
-
-count = 0
-for i in range(200):
-    input = test_set_input[i]
-    target = test_set_output[i]
-    y1, norm1, mu1, sigma2_1, norm1_scaled, z1, y2, norm2, mu2, sigma2_2, norm2_scaled, z2, y3, prediction = m.forward_pass(input)
-    if (np.argmax(prediction) == np.argmax(target)):
-        count = count + 1
-        
-print("Accuracy: ", count / 200)
+all_predictions = m.forward_pass(test_set_input)[-1] # shape (200, 10)
+predicted_classes = np.argmax(all_predictions, axis=1)
+true_classes = np.argmax(test_set_output, axis=1)
+accuracy = np.mean(predicted_classes == true_classes)
+print("Accuracy: ", accuracy)
