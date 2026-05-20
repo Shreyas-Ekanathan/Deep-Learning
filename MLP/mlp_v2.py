@@ -189,18 +189,18 @@ batch_size = 100
 N = 10000
 num_batches = int(N / batch_size)
 train_set_input, train_set_output = generate_data(N)
-test_set_input, test_set_output = generate_data(200)
+test_set_input, test_set_output = generate_data(1000)
 m = model()
 
 learning_rate = 0.001
 
-for i in range(1000): # 1000 training epochs
+for i in range(2500): # 1000 training epochs
     batches, targets = get_batches(train_set_input, train_set_output, batch_size) 
     # batch should be batch_size x 3
     for j in range(num_batches):
         y1, norm1, mu1, sigma2_1, norm1_scaled, z1, y2, norm2, mu2, sigma2_2, norm2_scaled, z2, y3, prediction = m.forward_pass(batches[j])
         m.adam(batches[j], y1, norm1, mu1, sigma2_1, norm1_scaled, z1, y2, norm2, mu2, sigma2_2, norm2_scaled, z2, y3, prediction, targets[j], 0.9, 0.999, learning_rate)
-    if (i % 10 == 0):
+    if (i % 25 == 0):
         # evaluate on test set
         y1, norm1, mu1, sigma2_1, norm1_scaled, z1, y2, norm2, mu2, sigma2_2, norm2_scaled, z2, y3, prediction = m.forward_pass(test_set_input)
         print("Loss: ", m.cross_entropy_loss(prediction, test_set_output))
