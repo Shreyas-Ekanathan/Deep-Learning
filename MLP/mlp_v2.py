@@ -26,9 +26,9 @@ def generate_data(N):
         t = np.linspace(j*4, (j+1)*4, n) + np.random.randn(n)*0.2 # azimuthal angle
         phi = np.linspace(j*np.pi/K, (j+1)*np.pi/K, n) + np.random.randn(n)*0.1 # polar angle
         X[ix] = np.c_[
-            r*np.sin(phi)*np.cos(t) + np.random.uniform(-0.05, 0.05, size=n),
-            r*np.sin(phi)*np.sin(t) + np.random.uniform(-0.05, 0.05, size=n),
-            r*np.cos(phi) + np.random.uniform(-0.05, 0.05, size=n)
+            r*np.sin(phi)*np.cos(t) + np.random.uniform(-0.1, 0.1, size=n),
+            r*np.sin(phi)*np.sin(t) + np.random.uniform(-0.1, 0.1, size=n),
+            r*np.cos(phi) + np.random.uniform(-0.1, 0.1, size=n)
         ]
         y[ix] = j
     y_onehot = np.zeros((n*K, K))
@@ -81,13 +81,21 @@ class model:
         self.beta1 = np.zeros(128)
         self.beta2 = np.zeros(32)
         
+        self.layer1_dropout = np.zeros(128)
+        self.layer2_dropout = np.zeros(32)
+
     def cross_entropy_loss(self, prediction, target):
         return np.mean(np.sum(-target * np.log(prediction + 1e-12), axis = 1))
     
-    def regularized_loss(self, prediction, target, reg_coef):
-        #WE HAVENT ACTUALLY INCORPORATED THIS YET
-        return self.cross_entropy_loss(prediction, target, batch_size) + reg_coef * (self.w1 ** 2 + self.w2 ** 2 + self.w3 ** 2 + self.b1 ** 2 + self.b2 ** 2 + self.b3 ** 2) 
-    
+    def regularized_loss(self, prediction, target):
+        return (self.cross_entropy_loss(prediction, target) 
+                + reg_coef * (np.sum(self.w1 ** 2) + np.sum(self.w2 ** 2) + np.sum(self.w3 ** 2)
+                              + np.sum(self.b1 ** 2) + np.sum(self.b2 ** 2) + np.sum(self.b3 ** 2)))
+        
+    def dropout(self):
+        self.layer1_dropout = np.random.rand(128) > 0.25
+        self.layer2_dropout = np.random.rand(32) > 0.1
+                        
     def relu(self, y):
         return np.maximum(0, y)    
          
@@ -113,11 +121,11 @@ class model:
         y1 = input_batch @ self.w1 + self.b1 #batch_size x 128
         norm1, mu1, sigma2_1 = self.batch_normalize(y1)
         norm1_scaled = self.gamma1 * norm1 + self.beta1 #batch_size x 128
-        z1 = self.relu(norm1_scaled) # batch_size x 128
+        z1 = self.relu(norm1_scaled) * self.layer1_dropout # batch_size x 128
         y2 = z1 @ self.w2 + self.b2 # batch_size x 32
         norm2, mu2, sigma2_2 = self.batch_normalize(y2)
         norm2_scaled = self.gamma2 * norm2 + self.beta2
-        z2 = self.relu(norm2_scaled) # batch_size x 32
+        z2 = self.relu(norm2_scaled) * self.layer2_dropout # batch_size x 32
         y3 = z2 @ self.w3 + self.b3 #batch_size x 10 <- one hot encoding, each row is the predictions for one sample
         prediction = self.softmax(y3)
         return y1, norm1, mu1, sigma2_1, norm1_scaled, z1, y2, norm2, mu2, sigma2_2, norm2_scaled, z2, y3, prediction
@@ -125,28 +133,28 @@ class model:
     def backprop(self, input_batch, y1, norm1, mu1, sigma2_1, norm1_scaled, z1, 
                  y2, norm2, mu2, sigma2_2, norm2_scaled, z2, y3, prediction, target):
         y3_bar = (prediction - target) / batch_size #batch_size x 10
-        w3_bar = z2.T @ y3_bar #32xbatch_size * batch_size x 10 -> 32x10
-        b3_bar = np.sum(y3_bar, axis = 0)
+        w3_bar = z2.T @ y3_bar + reg_coef * self.w3 #32xbatch_size * batch_size x 10 -> 32x10
+        b3_bar = np.sum(y3_bar, axis = 0) + reg_coef * self.b3
         w3_v_update = w3_bar ** 2
         b3_v_update = b3_bar ** 2
-        z2_bar = y3_bar @ self.w3.T # batch_sizex10 * 10x32 -> batch_size x 32
+        z2_bar = (y3_bar @ self.w3.T) * self.layer2_dropout # batch_sizex10 * 10x32 -> batch_size x 32
         norm2_scaled_bar = z2_bar * (norm2_scaled > 0)
         gamma2_bar = np.sum(norm2 * norm2_scaled_bar, axis = 0) # vector of length 32
         beta2_bar = np.sum(norm2_scaled_bar, axis = 0) #len 32
         norm2_bar = self.gamma2 * norm2_scaled_bar #batch_size x 32
         y2_bar = self.batch_norm_backprop(norm2, mu2, sigma2_2, norm2_bar) #batch_size x 32
-        w2_bar = z1.T @ y2_bar #128x32
-        b2_bar = np.sum(y2_bar, axis = 0) #1x32
+        w2_bar = z1.T @ y2_bar + reg_coef * self.w2 #128x32
+        b2_bar = np.sum(y2_bar, axis = 0) + reg_coef * self.b2 #1x32
         w2_v_update = w2_bar ** 2
         b2_v_update = b2_bar ** 2
-        z1_bar = y2_bar @ self.w2.T #batch_size x 128
+        z1_bar = (y2_bar @ self.w2.T) * self.layer1_dropout #batch_size x 128
         norm1_scaled_bar = z1_bar * (norm1_scaled > 0) #batch_size x 128
         gamma1_bar = np.sum(norm1 * norm1_scaled_bar, axis = 0) #1x128
         beta1_bar = np.sum(norm1_scaled_bar, axis = 0) #1x128
         norm1_bar = self.gamma1 * norm1_scaled_bar
         y1_bar = self.batch_norm_backprop(norm1, mu1, sigma2_1, norm1_bar)
-        w1_bar = input_batch.T @ y1_bar
-        b1_bar = np.sum(y1_bar, axis = 0) 
+        w1_bar = input_batch.T @ y1_bar + reg_coef * self.w1
+        b1_bar = np.sum(y1_bar, axis = 0) + reg_coef * self.b1
         w1_v_update = w1_bar ** 2
         b1_v_update = b1_bar ** 2
 
@@ -185,27 +193,33 @@ class model:
         self.beta1 -= alpha * beta1_update
         self.beta2 -= alpha * beta2_update
 
-batch_size = 100
-N = 10000
+batch_size = 250
+N = 25000
 num_batches = int(N / batch_size)
 train_set_input, train_set_output = generate_data(N)
 test_set_input, test_set_output = generate_data(1000)
 m = model()
 
 learning_rate = 0.001
+reg_coef = 0.075
 
-for i in range(2500): # 1000 training epochs
+for i in range(5000): # 5000 training epochs
     batches, targets = get_batches(train_set_input, train_set_output, batch_size) 
     # batch should be batch_size x 3
     for j in range(num_batches):
+        m.dropout()
         y1, norm1, mu1, sigma2_1, norm1_scaled, z1, y2, norm2, mu2, sigma2_2, norm2_scaled, z2, y3, prediction = m.forward_pass(batches[j])
         m.adam(batches[j], y1, norm1, mu1, sigma2_1, norm1_scaled, z1, y2, norm2, mu2, sigma2_2, norm2_scaled, z2, y3, prediction, targets[j], 0.9, 0.999, learning_rate)
-    if (i % 25 == 0):
+    if (i % 100 == 0):
         # evaluate on test set
+        m.layer1_dropout = np.ones(128)
+        m.layer2_dropout = np.ones(32)
         y1, norm1, mu1, sigma2_1, norm1_scaled, z1, y2, norm2, mu2, sigma2_2, norm2_scaled, z2, y3, prediction = m.forward_pass(test_set_input)
-        print("Loss: ", m.cross_entropy_loss(prediction, test_set_output))
+        print("Loss: ", m.regularized_loss(prediction, test_set_output))
             
 # find the accuracy after training
+m.layer1_dropout = np.ones(128)
+m.layer2_dropout = np.ones(32)
 all_predictions = m.forward_pass(test_set_input)[-1] # shape (200, 10)
 predicted_classes = np.argmax(all_predictions, axis=1)
 true_classes = np.argmax(test_set_output, axis=1)
