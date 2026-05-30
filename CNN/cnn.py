@@ -115,7 +115,7 @@ class model:
         # now the second convolution. pooled has shape batch_size x 14 x 14 x 18
         # the second filter has shape 5 x 5 x 18 x 9
         filter2 = self.kernel2.reshape(-1, 9) # 450 x 9
-        pad2 = 1
+        pad2 = 2
         padded2 = np.pad(batch, ((0,0), (pad2, pad2), (pad2, pad2), (0,0)), mode='constant', constant_values=0)
         #shape: batch_size x 15 x 15 x 18
         #extract 5x5x18 patches
@@ -125,12 +125,12 @@ class model:
                 for j in range(14):
                     flattened2[n, i * 14 + j] = padded2[n, i : i + 3, j : j + 3, :].reshape(-1)
                     
-        y2 = flattened2 @ filter2 + self.kernel_b2
-        z2 = self.relu(y2)
+        y2 = flattened2 @ filter2 + self.kernel_b2 #196 x 9
+        z2 = self.relu(y2) #196 x 9
         
         #unroll and pool again
         unrolled2 = z2.reshape(batch_size, 14, 14, 9)
-        pooled2 = np.zeros(batch_size, 7, 7, 18)
+        pooled2 = np.zeros(batch_size, 7, 7, 9)
         for n in range(batch_size):
             for m in range(9):
                 for i in range(7):
@@ -141,14 +141,45 @@ class model:
                         pooled2[n, i, j, m] = max
 
         #flatten into 1 layer for the fully connected layers
-        flattened3 = pooled2.resize(batch_size, -1)
-        y3 = flattened3 @ self.fc1 + self.fc_b1
-        z3 = self.relu(y3)
+        flattened3 = pooled2.reshape(batch_size, -1) #batch_size x 441
+        y3 = flattened3 @ self.fc1 + self.fc_b1 #batch_size x 128
+        z3 = self.relu(y3) #batch_size x 128
         
-        y4 = z3 @ self.fc2 + self.fc_b2
-        prediction = self.relu(y4)
+        y4 = z3 @ self.fc2 + self.fc_b2 #batch_size x 10
+        prediction = self.softmax(y4) #batch_size x 10
         
-    def backprop():
+    def backprop(self, prediction, target, z3, y3, flattened3, pooled2, unrolled2, y2, flattened2, filter2):
+        y4_bar = (prediction - target) / batch_size #batch_size x 10
+        z3_bar = y4_bar @ self.fc2.T #batch_size x 128
+        fc2_bar = z3.T @ y4_bar + reg_coef * self.fc2 #128x10
+        fc_b2_bar = np.sum(y4_bar, axis = 0) + reg_coef * self.fc_b2 #10x1
+        
+        y3_bar = (y3 > 0) * z3_bar # batch_size x 128
+        flattened3_bar = y3_bar @ self.fc1.T #batch_size x 441
+        fc1_bar = flattened3.T @ y3_bar + reg_coef * self.fc1 #441x128
+        fc_b1_bar = np.sum(y3_bar, axis = 0) + reg_coef * self.fc_b1 #128x1
+        
+        pooled2_bar = flattened3_bar.reshape(batch_size, 7, 7, 9)
+        unrolled2_bar = np.zeros(batch_size, 14, 14, 9)
+        for n in range(batch_size):
+            for m in range(9):
+                for i in range(7):
+                    for j in range(7):
+                        #2i, 2i+1, 2j, 2j+1
+                        if (unrolled2[n, 2*i, 2*j, m] == pooled2[n, i, j, m]):
+                            unrolled2_bar[n, 2*i, 2*j, m] = pooled2_bar[n, i, j, m]
+                        elif (unrolled2[n, 2*i, 2*j+1, m] == pooled2[n, i, j, m]):
+                            unrolled2_bar[n, 2*i, 2*j+1, m] = pooled2_bar[n, i, j, m]
+                        elif (unrolled2[n, 2*i+1, 2*j, m] == pooled2[n, i, j, m]):
+                            unrolled2_bar[n, 2*i+1, 2*j, m] = pooled2_bar[n, i, j, m]
+                        elif (unrolled2[n, 2*i+1, 2*j+1, m] == pooled2[n, i, j, m]):
+                            unrolled2_bar[n, 2*i+1, 2*j+1, m] = pooled2_bar[n, i, j, m]
+        
+        z2_bar = unrolled2_bar.reshape(batch_size, 196, 9) 
+        y2_bar = (y2 > 1) * z2_bar #batch_size x 196 x 9
+        flattened2_bar = y2_bar @ filter2.T #batch_size x 196 x 450
+        filter2_bar = np.einsum('bpk,bpj->kj', flattened2, z2_bar)  # 450x9
+        kernel_b2_bar = np.sum(y2_bar, axis=0) + reg_coef * self.kernel_b2
         return 0
     
     def adam():
