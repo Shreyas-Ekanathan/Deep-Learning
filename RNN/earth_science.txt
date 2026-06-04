@@ -1,0 +1,1608 @@
+GEOLOGY
+Minerals
+General Mineralogy
+Minerals are inorganic, have definite crystal structures, are natural, etc.
+Most minerals are extracted from veins (with open spaces called vugs) and pegmatites
+Common mineral habits include: bladed (like a knife, e.g. kyanite), columnar (tourmaline), acicular(needlelike, actinolite), tabular(flat, barite), fibrous (ulexite), massive (no apparent faces).
+Solid solutions form between elements that have similar charges and atomic sizes so that they can interchange between each other.
+Coupled substitutions can also occur to match charges.
+Mineral systems are defined based on: 1)Rotation axes, 2)mirror planes, 3)centers of symmetry, and 4)rotoinversion axes.
+Rotoinversion = rotation about an axis and inversion through a point. 
+Crystal systems: Isometric, hexagonal, tetragonal, orthorhombic, monoclinic, triclinic. 
+Miller indices: Take a as the axis pointing towards you, b as the axis pointing to the right, and c as the axis pointing up. Find where the plane meets each axis (infinity if no intersection), invert, and scale up to integer values.  
+These axes can be projected onto a circle similar to stereographic projections. 
+Twinning forms due to the symmetrical intergrowth of two or more crystals.
+Are bound by a symmetry element (could be a mirror plane, inversion center, or something else).
+Contact twins: A uniform plane binds two crystals.
+Penetration twins: individual crystals penetrate each other, are typically formed from rotation and defined by an axis of rotation.
+Polymorphism is the phenomena where a given mineral, with the same composition, can occur in multiple structural arrangements.
+Different conditions (temperature and pressure) favor the formation of different minerals.
+Examples: kyanite, andalusite, sillimanite, or orthoclase, microcline, sanidine.
+
+Birefringence and other optical phenomena occur because light passes through some axes of the mineral slower than others. Calcite commonly shows birefringence. 
+Different minerals show different amounts of absorption under different planes of incidence, for example micas show the most absorbance when light is shone parallel to their plane of cleavage. 
+Ternary mineral diagrams show the relative compositions of a mineral sample relative to its three end members, which form a solid solution (similar to soil triangles).
+Pyroxene example:  
+Silicate structures:
+Phase diagrams show the structure of minerals under various physical conditions. 
+Minerals lower the melting point of other minerals. 
+The liquidus line above forms due to the presence of the other mineral.
+At the eutectic point, the two minerals and the liquid phase are present.
+Track the progression of a melting rock with a composition of z: 1)melting until the rock reaches the solidus, 2)melting of diopside to eutectic, 3)complete melting of diopside, 4)Temperature rises along anorthite liquidus until initial concentration is equal to final concentration. 
+The lever rule can help you determine the concentrations of minerals in a melt. 
+In equilibrium crystallization or melting in a closed system, the final composition of the system will be identical to the initial composition of the system.
+Tracking crystallization of X  in the melt below: 
+T > T1 -- all liquid
+T1 - TE -- liquid + A
+at TE -- liquid + A + B
+T < TE -- A + B all solid
+The lever rule can find the compositions of the melt at each point. For example, at T2:
+% crystals of A = b/(a + b) x 100
+% liquid = a/(a + b) x 100
+For solid solutions, cool down, then along the liquidus until you reach the point that extrapolates across to the same initial composition (in the diagram below, this would be until l3).
+To find the composition of a mineral when it first crystallizes, draw an isotherm (in this case, a horizontal line). Then, continue this line until it intersects the solidus. From this intersection point, extrapolate downward to find the composition of the crystallizing solid. 
+Incongruent melting often occurs when a solid crystallizes from a melt with a different composition than the initial melt. 
+Exsolution forms when a mineral system forms a solid solution at high temperatures but not at low temperatures. 
+Exhibited by feldspars.
+The solid solution is stable above the solvus line shown on the diagram.
+The exsolution occurs along the solvus as the two feldspars separate from the mixture and become disjoint, unlike a solid-solution where they are in a homogenous mixture.
+Example of crystal x: At 700 C the solid solution is stable. Cooling to 590 C begins exsolution into two solutions, one with composition A and one with composition B. Further exsolution produces two solutions C and D. The lever rule can be used to find the percentages of C and D in the solution. 
+Exsolution tends to produce banding patterns called exsolution lamellae, with alternating bands of minerals. 
+When fractional crystallization occurs, the end composition of the crystals is not necessarily the same as the initial composition of the melt. 
+In fractional crystallization, any crystals that form tend to become separated from the melt and no longer interact with the melt. This tends to occur because of settling, with denser crystals produced settling out of the melt and become separated from the remainder of the system.
+For the below diagram: Crystallization of X begins with cooling to the liquidus at roughly 800 C, and then these crystals of Fo will settle out of the system. Then, once the system reaches P (peritectic point), all the forsterite will have precipitated out of solution, and now enstatite crystals will now begin to form. Once the eutectic is reached, quartz begins to crystallize until only solid remains. Thus, through fractional crystallization, a product of enstatite and quartz where in equilibrium crystallization forsterite and enstatite would have formed.
+
+Normal zoning forms in minerals when the center of a crystal is enriched in early-crystallizing components and the rim is composed of late-crystallizing components.
+Occurs in crystallization when magma smoothly crystallizes.
+Reverse zoning is the opposite of normal zoning, and may form due to fresh influxes of magma or the mixing of two magmas.
+Oscillatory zoning is a mix of the above two types of zoning, and forms as minerals move around in the magma chamber and heat and cool in the process. 
+The separation of one mineral from another is known as an exsolution, and this separation occurs along the solvus line. 
+Exsolution lamellae commonly form in such scenarios.
+In many decay schemes some of the decay product may already have been present in the environment to begin with. To determine this initial value and determine the absolute age requires more than one sample with different concentrations of the radioactive nuclide. The initial values are often important in revealing whether the source of a magma was in the crust or mantle.
+Calcium and sulfur minerals tend to form near hydrothermal vents where they can be concentrated much higher than normal. 
+Hydrothermal vents are good at oxidizing elements like Ca to Ca2+.
+Incompatible elements are elements that are large and do not fit easily into crystal lattices due to their size or charge. As a result, they remain concentrated in the melt for longer periods of time before crystallizing later in the magma's life. 
+Increased melting percentage → decreased incompatible element concentration. This is because the incompatible elements are preferentially ejected from the crystal lattices during melting. 
+Fractional crystallization → increased incompatible element concentration. 
+Metamorphic triangular plots:
+The corners show the compositions of the end members. 
+In a given system, minerals that could form from the metamorphic environment will be shown on the diagram relative to the end members. 
+Connecting these minerals are tie lines, and within the tie lines, any point represented will have minerals of the 3 end members of the smallest triangle surrounding this point. 
+For example, at point x, minerals of composition A, AB, and A2C would form. 
+An assemblage at z would have much more of A than an assemblage at x.
+Changing pressure and temperature conditions will change the tie lines and hence change mineral assemblages during metamorphism. 
+Borate Family
+Ulexite
+Commonly found in evaporite deposits. Precipitated ulexite commonly forms a "cotton ball" tuft of acicular crystals.
+Perfect cleavage along {010}
+Soft, brittle.
+Fibrous aggregates project light onto the surface, giving it the nickname TV rock. 
+Carbonate Family
+Most carbonates exhibit rhombohedral cleavage(3 cleavage directions).
+Aragonite
+Orthorhombic crystal system. 
+May occur in acicular, pyramidal, or tabular crystals. 
+Commonly shows cyclic twinning. 
+Differentiated from calcite by its higher specific gravity and lack of rhombohedral cleavage. 
+Azurite
+Monoclinic crystal system. 
+Forms in oxidized copper ore deposits.
+Weathers into malachite.
+Commonly botryoidal in a royal blue color.
+3.5-4 hardness.
+Calcite
+Main constituent of limestone. 
+Low pressure version of aragonite. 
+Most commonly occurs in a rhombohedral form. 
+Typically transparent to translucent, exhibits birefringence. 
+Reacts vigorously with HCl.
+Dolomite
+CaMg(CO3)2
+Hexagonal crystal structure, commonly shows saddle-shaped crystals. 
+Reacts slowly with cold HCl, vigorously with hot HCl. 
+Used in the manufacturing of cements. 
+Malachite
+Forms from the weathering of copper ores or azurite. 
+Monoclinic crystal system. 
+Also massive or botryoidal, typically a dark green color. 3.5-4 hardness.
+Native Element Family
+Copper
+Minor ore of copper.
+Associated with basaltic lavas where copper was deposited because of reactions with hydrothermal fluids. 
+Isometric crystal system commonly forms distorted cubes, octahedrons, and dodecahedrons. Branching and irregular masses are common.
+Very malleable and ductile, with hackly fracture. Typically dark colored due to tarnish with a metallic luster. 
+Diamond
+High temperature polymorph of carbon. Common in peridotitic or ultramafic igneous rocks.
+Isometric crystals commonly forming in cubes or dodecahedrons. 
+Perfect octahedral cleavage {111}, hardest mineral, commonly octahedral, adamantine luster. 
+Graphite
+Common component of metamorphic rocks. 
+Typically formed from the decomposition of organic material that was converted to graphite during metamorphism. 
+Low pressure polymorph of carbon, with diamond being the high pressure polymorph. 
+Very soft, black streak, metallic luster, and perfect basal cleavage. Leaves black marks on fingers. 
+Halide Family
+Fluorite
+CaF2
+Common in hydrothermal mineral deposits.
+Isometric, very common in cubic crystals. 
+Perfect octahedral cleavage along {111}
+Halite
+Exhibits cubic cleavage
+Common constituent of evaporite deposits in sedimentary basins. 
+Isometric crystal system, commonly occurs in cubic habits.
+Often used in the chemical industry. 
+Oxide/Hydroxide Families
+Corundum
+Al2O3
+Forms from high grade contact metamorphosis of aluminous rocks.
+Hexagonal crystal system, commonly ends in tapering hexagonal pyramids with horizontal striations. 
+Hematite
+Fe2O3
+Hexagonal crystal system, typically tabular on {001}. Can also be massive.
+Reddish color, red streak, and metallic luster.
+Source of mineral pigments and powder.
+Magnetite
+Fe3O4
+Commonly forms in mafic igneous bodies.
+Crystallizes early in mafic rocks and later in felsic rocks, so is better defined in mafic rocks.
+Isometric crystals commonly formed in octahedrons with rare dodecahedrons.
+Dark colored mineral with a metallic luster and strong magnetism.
+Phosphate Family
+Apatite
+Present in felsic igneous rocks and pegmatites.
+Hexagonal crystals, typically with long prismatic habits.
+Has bad basal cleavage planes. 
+Usually has a vitreous luster.
+Sulfate Family
+Anhydrite
+CaSO4 (Gypsum with the water driven off).
+Common in evaporite deposits. 
+Orthorhombic, typically massive crystals. 
+Cleavage along {010} perfect, {100} near perfect, and good on {001}.
+Barite	
+BaSO4
+Common mineral in many ore deposits.
+Forms a complete solid solution with celestite. 
+Orthorhombic crystal system, crystals are typically tabular on {001}. 
+Commonly forms in desert roses or crested barite. 
+High specific gravity, tabular crystals, and excellent cleavage. 
+Celestite
+SrSO4
+Often found in massive or fibrous forms. 
+Forms in geodes or evaporite deposits. 
+Perfect cleavage on {001}, relatively soft. 
+Gypsum varieties
+CaSO4·2H2O
+Excellent cleavage parallel to {010}
+Monoclinic crystal system. 
+Alabaster (massive)
+Satin Spar (fibrous)
+Selenite (crystalline)
+Sulfide Family
+Sulfides are common components of acid mine drainage. 
+Also tend to form near hydrothermal vents or in leached regions. 
+Galena
+PbS
+Common sulfide mineral in hydrothermal vents, with sphalerite, pyrite, chalcopyrite, bornite, and other minerals. 
+Isometric crystal, commonly forms in cubes or octahedrons. 
+Very soft, perfect cleavage along {001}, metallic luster and high specific gravity. 
+Pyrite
+FeS2
+Isometric crystals commonly in cubic or octahedral forms.
+May have striated faces, is typically brittle with a dark yellow color. Relatively hard.
+Used in medicinal products and irrigation because of its sulfur content.
+Pyrite can be oxidized to form goethite or limonite. 
+Sphalerite
+ZnS
+Commonly found with galena.
+Isometric, commonly forms in tetrahedra, dodecahedra, or cubes, 
+Perfect cleavage along {011}, nonmetallic luster, dark streak. 
+Silicate Family
+Andalusite
+Found in low-medium grade metamorphic rocks like schists. Is also common in regions of contact metamorphism.
+Nesosilicate, forms a solid solution with kyanite and sillimanite. 
+Beryl
+Hexagonal crystal system.
+Commonly found in pegmatites or schists. 
+Conchoidal fracture, fairly hard (7.5 on mohs).
+Cyclosilicate. 
+Chlorite
+A common constituent of greenschist facies. 
+Also occurs during the retrograde metamorphism of ferromagnesian minerals. 
+Normally forms in foliated masses because it is a phyllosilicate.
+Greenish color, low hardness, and perfect cleavage along {001}.
+Epidote
+Common sorosilicate that forms in medium grade regional metamorphism. 
+Also forms in vesicles or fractures in basalts. 
+Monoclinic, commonly prismatic parallel to the b axis (towards the screen).
+Relatively hard, perfect cleavage along {001}.
+Kaolinite
+Al2Si2O5(OH)4
+Forms from the weathering of potassium feldspars. 
+A common phyllosilicate, as most clays are. 
+Has a triclinic crystal system, and commonly appears in a massive form. Is very soft. 
+Kyanite
+Commonly associated with staurolite and granite. 
+Typically forms in long tabular crystals or bladed aggregates. Is triclinic.
+Different hardnesses in two perpendicular directions. Perfect cleavage along {100}.
+Olivine
+(Fe,Mg)2SiO4 → nesosilicate
+Olivines involve a solid solution where Fe and Mg can substitute for each other.
+Orthorhombic crystal system. 
+Green mineral, typically exhibits conchoidal fracture and commonly glassy luster. Relatively high birefringence and high relief. 
+Can hydrolyze to form serpentinite. 
+Quartz
+Major constituent of felsic igneous rocks.
+Common vein forming mineral and highly stable.
+Tectosilicate with formula SiO2
+Shows conchoidal fracture (breaks along curved planes). Usually colorless or white with a glassy or vitreous luster. Very hard (8 on Mohs).
+Coesite and stishovite are the high pressure versions of quartz.
+Mainly used in glassmaking and ceramics.
+Sillimanite
+Forms in aluminous high grade metamorphic rocks. 
+Sodalite
+Rare rock-forming mineral found in silica-deficient felsic rocks, like syenite.
+Isometric tectosilicate with formula Na4Al3Si3O10Cl, with some substitution of K for Na.
+Poor cleavage, color is normally a dark blue.
+Used in gemstones and for ornamental objects.
+Staurolite
+Metamorphic mineral that forms in prograde reactions in medium grade rocks.
+Is a nesosilicate that often has twinning at either 90 or 60 degrees. 
+Relatively high hardness (7-7.5), reddish brown color typically. 
+Talc
+Common product of retrograde metamorphism of ultramafic rocks due to the alteration of magnesium silicates like olivine. 
+Is the major mineral component of soapstone. 
+Belongs to the phyllosilicates. 
+Normally formed in foliated masses, euhedral crystals are uncommon. 
+Very soft, excellent cleavage along one plane, typically feels greasy. 
+Topaz
+Forms as the result of metamorphism of bauxite.
+Commonly found with kyanite and sillimanite.
+Also commonly found in hydrothermal ore deposits. 
+Common nesosilicate mineral that forms in prismatic crystals terminated by pyramids. 
+Orthorhombic crystal structure. 
+Perfect cleavage along {001}, variable color, high specific gravity. 
+Tourmaline
+Commonly forms in granite pegmatites and other felsic igneous rocks.
+Is the most common cyclosilicate.
+Normally forms in a hexagonal structure with a trigonal prism shape.
+Also displays conchoidal fracture and is most commonly black. Commonly tabular in habit with well defined crystals. 
+Amphibole Group
+Double chain inosilicates.
+Hornblende
+Occurs in both felsic and mafic igneous rocks.
+Cleavage at 60 and 120 degrees, helps to differentiate from augite. 
+Feldspar Group
+Prismatic cleavage at 90 degree angles.
+Are often used in concrete and asphalt. Also used in glass and ceramics.
+Tectosilicates
+Plagioclase feldspars:
+Triclinic crystal system. 
+Perfect cleavage on {001}
+Albite
+NaAlSi3O8
+Commonly shows twin lamellae which helps to id.
+Labradorite
+Show iridescent color play.
+Potassium feldspars:
+KAlSi3O8
+Sanidine is the high temperature polymorph, while orthoclase and microcline form at low-intermediate temperatures.
+Orthoclase/Microcline
+Microcline is triclinic, orthoclase is monoclinic.
+Have perfect {001} cleavage, good on {010}
+Green microcline = amazonite.
+Commonly exhibit carlsbad twinning.
+K-spars tend to weather to form kaolinite. 
+Garnet Group
+Common metamorphic minerals.
+Garnets are nesosilicates. 
+Have an isometric crystal structure that commonly forms in dodecahedra. 
+Relatively hard, typically dark reddish in color. 
+Almandine
+Mica Group
+Phylosillicates, commonly exhibit basal cleavage.
+Used in paints, plastic, cosmetics, etc. 
+Major constituent of granites. 
+Biotite
+Monoclinic, normally forms in foliated masses. Dark colored. 
+Muscovite
+Monoclinic, usually tabular with clear layering. 
+Typically lighter colored. 
+Very elastic, pearly luster.
+Pyroxene Group
+
+Are inosilicates.
+Augite
+
+Major constituent of most mafic igneous rocks.
+CaFeSi2O6, with a solid solution between Mg and Fe.
+Forms in monoclinic, prismatic crystals that are typically dark colored. Normally square and eight-sided cross sections. Cleavage at near 90 degree angles.
+Rocks
+Rock Cycle
+
+
+Igneous
+Magma formation: 
+Most melting occurs at the eutectic or peritectic points because these points minimize the temperature required for melting.
+Decompression melting: Removal of confining pressure on rock allows for melting. Common at hotspots, can also occur during isostatic rebound. Produces magma in the upper mantle, as well as at mid-ocean ridges.
+Flux melting: Introduction of volatiles decreases melting point and causes melting. Water is a common volatile. 
+Temperature increases: Heat is transferred from one body to another, initiating melting.
+As magma rises towards the surface, the pressure decreases, causing volatiles in the magma to exsolve and increase the pressure internal to the magma, continuing to force the magma upwards. 
+More gas = more explosive because there's greater pressure. 
+The crystallization of minerals releases latent heat which causes the magma to remain hotter for longer and slows the cooling process.
+Types of magma:
+Mafic: high in Fe, Mg, Ca, low in K, Na.
+Intermediate: medium in Fe, Mg, Ca, K, Na.
+Felsic: high in K, Na, low in Fe, Mg, Ca.
+Temperature order(lowest to highest): felsic, intermediate, mafic.
+Viscosity order(least to most): mafic, intermediate, felsic. Density is the opposite order. 
+The silica chains in highly felsic magma make it very interlinked and makes it harder for the magma to flow. 
+The dissolution of water in magma can interrupt these bonds and thus decrease the viscosity of magma. 
+Cooling of magma also makes it more viscous. This causes initial magmatic release from shield volcanoes to form pahoehoe lavas, but later ones become aa as they are more viscous. 
+Mafic minerals include olivine, pyroxene. 
+Intermediate minerals include amphibole, biotite.
+Felsic minerals include feldspars and quartz.
+Assimilation of felsic crust can make mafic magma felsic. 
+Furthermore, fractional crystallization also makes magma more felsic since mafic minerals crystallize at higher temperatures and therefore the magma becomes more felsic. 
+The separation of these crystals decreases the density and increases the viscosity of magma as it becomes more felsic. 
+Grading can form from this crystallization as the minerals precipitate out of solution in layers similar to sedimentary beds. 
+Magma composition:
+Volatiles: Dissolved gasses. More volatiles = more explosive.
+Significant amounts of volatiles tend to produce vesicular igneous rocks like scoria or pumice as the gasses rapidly escape from the magma.  
+This exsolution creates high amounts of vesicular rocks near the surface, when the rate of exsolution dramatically increases. 
+Solids: Crystallized minerals in melt form.
+Melt: liquefied ions. 
+Textures: 
+Aphanitic: can’t see crystals. Cooled quickly.
+Phaneritic: can see crystals. Cooled slowly. 
+Vesicular: Lots of vesicles due to trapped glass.
+Glassy: Cooled very quickly, crystals are tiny.
+Porphyritic: Larger crystals (phenocrysts) set in smaller crystals (groundmass). Product of igneous differentiation and differential cooling, typically in two stages. 
+Pyroclastic: Mixture of rock, ash, and other grains. Basically welded rock.
+Phenocrysts form due to crystallization initially in a magma chamber(slow) and then outside after an eruption(fast).
+Igneous rocks typically have uniform textures that allow them to be identified more easily.
+BOWENS:
+Shows the crystallization of minerals from a lava. 
+On the continuous branch, Ca-rich plagioclase that precipitates out of solution reacts with the liquid to be converted to Na-rich plagioclase.
+A similar process occurs on the discontinuous branch but it is not a solid solution anymore. 
+Igneous Intrusions and Bodies:
+Large intrusive igneous bodies likely form in several phases, as the magma is too viscous to flow together at once. 
+The buoyant force powers the intrusion of magma into rocks. 
+Dikes: discordant tabular intrusion, cuts across existing layers.
+Sheeted dike complexes form as successive intrusions of magma cut across the existing dikes and produce the sheeted texture visible. 
+Sill: concordant tabular intrusion. 
+Dikes and sills form when the magma can no longer rise vertically. At this point, it responds more to forces from the surrounding rock, and therefore either intrudes horizontally (in sedimentary basins) or spreads vertically (at divergent plate boundaries) which creates sills or dikes, respectively.
+The margins of dikes and sills cool faster and hence are finer grained than the interiors. 
+Laccolith: forcibly inserted igneous intrusion that causes dome-shaped warping of above layers.
+Form as sills extend laterally, and at some point it is easier for the magma to extend vertically than to continue to force its way in horizontally. 
+Deeper laccoliths are bigger because they need more force to lift the greater weight of rock above them.
+Batholith: Massive igneous intrusion, doesn’t warp above layers. Deep in Earth, typically doesn’t reach the crust.
+Always consist of granitic materials since they have high amounts of assimilation and stoping. 
+Small batholith = stock.
+Lopolith: upside down laccolith.
+Lopoliths tend to form very slowly and hence contain large amounts of mafic minerals. 
+Laccoliths and lopoliths are concordant, batholiths and stocks are discordant. 
+Flood basalts are massive outpourings of basaltic magma that form in regions of crustal breakup.
+Cooling of flood basalts forms columnar jointing. 
+
+Rock types:
+QAPF diagrams are commonly used to classify igneous rocks.
+Q = quartz, A = alkali feldspars (orthoclase, microcline, etc), P = plagioclase feldspars, F = feldspathoids (sodalite).
+Alkaline rocks form on the F side of the diagram, tholeiitic rocks form on the Q side. 
+Calc-Alkaline magmas are more commonly formed at convergent plate boundaries, while tholeiitic magmas tend to form at mid ocean ridges. 
+
+Anorthosite
+Rocks dominated by plagioclase. 
+Recrystallization accounts for their light color. 
+Andesite
+Most abundant calc-alkaline igneous rock. 
+Often porphyritic with strong zoning. 
+Relatively high silica content with some pyroxene. 
+Basalt
+Most abundant mafic igneous rock. 
+Fine crystals, composed abundantly of plagioclase feldspars, with slightly less quartz than feldspathoids. 
+Diorite
+Intermediate intrusive igneous rock.
+Plagioclases in diorite commonly exhibit high amounts of zoning.
+Other major mineral components include olivine, pyroxenes, and augite.  
+Gabbro
+Most common intrusive igneous rock.
+Intrusive equivalent of basalt. 
+Olivinde, reddish hornblende, and biotite are the main mineral components. 
+Magnetite is a common accessory mineral. 
+Granite
+Felsic endmember of the calc-alkaline magma series. Light colored.
+High amounts of feldspar, quartz. Also can have biotite or hornblende.
+Komatiite
+Most komatiites initially formed from the accumulation of mafic minerals as a magma differentiated. 
+Formed in the archean, where the much higher geothermal gradient allowed them to form at very high temperatures. 
+Obsidian
+Glassy igneous rock formed by rapid quenching of magma.
+Pegmatite
+Igneous rock formed by extremely slow cooling of magma, thus creating very large crystals.
+Peridotite
+Major constituent of the mantle.
+Undergoes a transition from plagioclase to spinel to garnet with increasing depth and pressure (post-spinel transition).
+Mainly composed of olivines and pyroxenes. 
+Pumice
+Felsic vesicular igneous rock that has a very low density.
+Rhyolite
+Light colored extrusive igneous rock that is low in mafic minerals.
+Lots of quartz and alkali feldspars (orthoclase/microcline).
+Commonly has biotite, augite, or hornblende as accessory minerals.  
+Scoria
+Mafic vesicular igneous rock.
+Syenite
+Coarse grained intrusive igneous rock with a similar composition to granite but lacking quartz.
+Composed mainly of nepheline, feldspars, and sodalite. 
+Also has accessory pyroxenes, amphiboles, and apatite.
+Trachyte
+light-coloured, very fine-grained extrusive igneous rock that is composed chiefly of alkali feldspar with minor amounts of dark-coloured minerals such as biotite, amphibole, or pyroxene
+Extrusive equivalent of syenite. 
+Tuff
+Formed by the compaction and rapid cooling of volcanic ash.
+Sedimentary
+Form from the compaction and cementation of weathered sediments.
+Sediment, Weathering, and Erosion: 
+Sediment sizes: clay, silt, sand, gravel, etc.
+The layered nature of sedimentary rocks tends to make them relatively weak.
+Weathering best occurs along preexisting fractures and joints where it is easier for water and other agents to penetrate the rock. 
+Weathering rates are overall much higher in tropical climates than dry climates. 
+Evaporite sediments form from the direct precipitation of ions in solution. 
+Alternating beds of coarse and fine grains tend to be indicative of yearly cycles, for example varve deposits in lakes. 
+Clays tend to have a high water content and expand rapidly under the presence of water, as they are often hydrated. However, they are not good aquifers because they are not permeable. 
+Reservoirs tend to need high porosities and permeabilities so that water can be extracted from them easily. 
+Rocks
+Shale: cemented clay.
+Siltstone: cemented silt.
+Sandstone: cemented sand. 
+High feldspar content = less weathered = bigger grain size (arkose).
+Conglomerate: rounded clasts, vs Breccia: angular clasts. 
+Biogenous sedimentary rocks: organic nature. Main one is limestone.
+Greywacke: Forms in turbidite deposits. Is composed of poorly sorted angular grains of quartz, feldspar, and small rock fragments or sand-size lithic fragments set in a compact, clay-fine matrix.
+Finer sediments = more energy in the depositional environment.  More rounded = more energy.
+Sedimentary rocks are typically layered due to the compression of sediments which allows them to be differentiated from other rocks. 
+Structures 
+Dunes
+Steeper face = slip face, points in the direction of current flow.
+Types: 
+Loess: wind blown deposits of sediment.
+Ripple marks: Form in lacustrine environments.
+Symmetrical means weak currents, wave oscillations, like in tidal environments.
+Straight means unidirectional current flow, like in a river or wind.
+
+Cross bedding: 
+Dunes that build up and reverse directions over time.
+
+The slopes seen are the slip faces and therefore they point towards the direction of flow. 
+Graded Bedding:
+Forms when sediments are deposited in a sorted manner, so that grain size increases as you move down the bed.
+Is common in aeolian and fluvial environments.
+Sedimentary basins:
+Regions of Earth’s crust that are marked by vast sedimentary layers.
+Form along subduction zones(forearc and backarc basins), as well as at passive continental margins because of the old, cool oceanic crust which subsides to create a basin.
+Also form at rift valleys as spreading occurs.
+Can cause subsidence of crust if heavy sediment loads are deposited on the basin, and opposite occurs if sediment loads are removed.
+Disconformities: 
+Rock types:
+Bauxite
+Composed of a mix of aluminum minerals in a clay matrix.
+Breccia
+Low energy sedimentary rock with angular clasts. 
+Have variable compositions but typically form in river environments, near the headwaters. 
+Coal
+Conglomerate
+High energy sedimentary rock with rounded clasts.
+Have variable compositions but typically form in river environments, near the mouth. 
+Evaporites
+Greywacke
+A type of sandstone that commonly forms in turbidite deposits. 
+Therefore exhibit graded bedding.
+Commonly dark colored. 
+More common at convergent and active plate margins. 
+Mudstone
+Sandstone
+Highly resistant to weathering. 
+Mainly composed of quartz, feldspars, and rock grains. 
+More transported = more quartz because quartz is more resistant to weathering than feldspar. 
+Thus more transported = more mature. 
+Arkose = high feldspar content, young and immature rocks. Commonly form in fluvial settings like point bars. 
+Shale
+Very fissile, easy to break.
+High in clay content.
+Form in essentially still water which allows the clay minerals to settle and compact into shale. 
+Siltstone
+Similar formation to shale but high in silt content.
+Limestone varieties
+Common carbonate rocks that form in typically warmer climates. 
+Tend to be well-bedded. 
+Are typically deposited in calm marine environments like shallow ocean regions. 
+Exposal of sedimentary rocks to currents tends to better sort them because the sediment is deposited in a sorted manner as it settles out of the water. 
+Chalk
+Fine grained carbonate mudstone that forms in the ocean as the result of the consolidation of the remains of calcareous organisms. 
+Coquina
+Fossil Limestone
+Travertine
+Massive, porous limestone that forms from hot springs.
+Is porous due to the presence of hot gas escaping the rock. 
+Common at waterfalls as well. 
+Metamorphic
+Rocks that undergo changes due to heating and pressure. 
+They typically show evidence of recrystallization which helps to identify them.
+Metamorphism typically compresses the protolith and releases fluids, which help to catalyze the process. 
+Fluids transport heat with them → increased metamorphism. 
+Also carries dissolved constituents like silica which cause compositional changes in the rock.
+The escaping fluid often precipitates to form mineral veins. 
+Since the release of fluid catalyzes the forward metamorphic reaction, the retrograde reaction typically needs an intrusion of fluid to catalyze the reaction. 
+When shear becomes intense near fault zones, large amounts of strain can cause so many new grains to nucleate that the rock becomes extremely fine grained → forms fault mylonites and breccias.
+Types:
+Contact: Intrusion of magma into a rock can cause heating which leads to physical changes. Does not produce foliation. 
+Rifting causes delamination, increasing the geothermal gradient and causing contact metamorphism. 
+Metasomatism: Chemical alteration of rock by hydrothermal fluids.
+These fluids tend to be released by cooling lavas and cause metamorphism of the surrounding rocks. 
+Regional: High pressure due to mountain building. Produces foliation.
+Retrograde vs Prograde:
+Retrograde: Occurs at decreasing temperatures and pressures. This decline leads to recrystallization 
+Prograde: Increasing temperature and pressure.
+Retrograde metamorphism is uncommon because 1)high temperatures are better for reactions, 2)prograde metamorphism involves fluids that retrograde doesn’t, and the fluids help catalyze metamorphism.
+
+Rocks
+Slate: lightly foliated, metamorphosed shale.
+Phyllite: moderate foliation, forms from metamorphosis of shale
+Schist: lots of foliation, forms from many protoliths.
+Gneiss: gneissic banding, many protoliths.
+Marble: metamorphosed limestone.
+Migmatite: mix between igneous and metamorphic. Recrystallized metamorphic rock.
+Quartzite: metamorphosed sandstone.
+Index Minerals and facies:
+
+
+
+Rock types:
+Amphibolite
+Gneiss
+Hornfels
+Marble
+Migmatite
+A rock that is the result of partial melting and recrystallization.
+Often has a composition similar to granite. 
+Phyllite
+Quartzite
+Schist
+Serpentinite
+Slate
+Crustal movement
+Faults
+
+Strike: the plane of the fault.
+Dip: the angle the fault makes with the horizontal. 
+Horsts: Uplifted fault blocks. Grabens: downdropped fault blocks.
+Plate Tectonics
+Convergent: Plates collide. Can create mountain ranges or subduction zones. Landforms include volcanic arcs, volcanic island arcs, and trenches. Characterized by reverse and thrust faults.
+Increased pressure → release of water → flux melting.
+The melt produced by the subducted plate is less dense and hence rises to produce the volcanic arcs seen.
+
+
+Divergent: Plates diverge. Form rift valleys or mid-ocean ridges. Normal faults. Fracture zones form due to differential rates of spreading at the ridges, can form transform faults.
+Fast spreading ridges have lower slopes because the plates have less time to cool and therefore do not subside as far. Become ocean rises, such as the East Pacific Rise. 
+The most heat loss occurs at divergent plate boundaries and mid-ocean ridges, showing that plate tectonics is cooling the internal regions of the planet.
+Divergent plate boundaries are very efficient at producing rocks.
+Hydrothermal alteration of rocks at mid-ocean ridges produces metamorphic rocks with hydrous and carbonate minerals.
+These minerals are transported to convergent plate boundaries, where the water is released from these minerals, which restarts the melting process via flux melting.
+Transform: Plates slide past each other. Strike-slip faults.
+
+Active continental margins have plate boundaries near them. Examples include the western coast of South America. Characterized by earthquakes, volcanoes, narrower and steeper continental shelves and slopes. 
+Passive continental margins are located far from plate boundaries. Examples include the eastern coast of North America. Are characterized by low lying continental plains and broad continental shelves.
+The older the crust is, the higher the subduction angle is.
+Faster spreading means younger crust so lower subduction angle.
+Shallower plate boundary means greater plate coupling and more friction.
+Coupling is also promoted by a lack of water (less lubricant).
+During subduction, an accretionary wedge or prism forms due to the scraping off of material on the subducting plate onto the adjacent plate. 
+Often includes ophiolite complexes, turbidites, or other oceanic sediments.
+Can cause isostatic sinking by adding extra weight to the plate which causes it to subside. 
+Back arc basin: Forms in subduction zones due to the creation of a convection cell from the melting plate. The steeper the subduction angle, the higher the rate of spreading.
+This is because steeper = older crust = more hydrated rocks = more water to be released = greater melting = stronger convection.
+
+
+
+Small forearc basins are associated with steep subduction angles.
+Plate tectonics is driven by slab pull, ridge push, and mantle convection. Slab pull is the strongest force, as the dense slabs drag the plate into the mantle.
+Slab pull: the cooling and densification of the subducting crust causes the plate to be further dragged into the mantle.
+Ridge push: The gravitational pull of a plate drags it downward away from the mid-ocean ridge, thereby causing plate movement to continue.
+Subducted plates level out at a certain depth (D’’ layer) because the buoyant force there balances out the sinking of the plate.
+There are several low-velocity anomalies  in the mantle: 1)D’’ layer, due to the presence of partially melted rocks (which aren’t rigid), 2)Mohorovic discontinuity, because the asthenosphere is less rigid than the above lithosphere.
+Mantle plumes typically cause rifting to produce a triple junction; however, only two of the arms remain active (become mid-ocean ridges) while the last becomes an inactive ridge.
+Below highly faulted regions, high-grade metamorphic complexes form. 
+Forearc basins often hold sediments accreted from the subducting plate.
+
+Earthquakes
+Seismic waves: 
+High speed anomalies are characterized by denser matter: cold, incompressible stuff. Low velocity zones are the opposite.
+More rigid = easier for waves to pass through = higher speed.
+Steeper subduction angle creates a stronger wadati-benioff zone because water is under more pressure to be released which causes greater melting and strong earthquakes. 
+Volcanoes
+Landforms:
+Caldera: crater at the top, forms due to eruptions.
+The exsolution of gasses weakens the interior rocks of the crater and causes it to cave in on itself, forming a caldera. 
+Fumaroles: vents that only release steam and other gasses.
+Parasitic cone: smaller cone on the side of a volcano, forms because lava and gasses push through to get an easier escape to the surface.
+Conduits carry lava from the magma chamber to the surface.
+Types:
+Shield: Gentle slope, non-explosive eruptions of basaltic lava.
+Cinder cone: Small volcanoes that result from strombolian eruptions, basaltic to andesitic composition.
+Stratovolcanoes: most dangerous, big pyroclastic flows, andesitic to rhyolitic lava, explosive eruptions. 
+Cinder cones can be found on the flanks of both shield and stratovolcanoes.
+Eruptions:
+Consist of several parts.
+Lava flows:
+Pyroclastic flows: flows of rock, hot ash, and gasses mixed.
+Nuee ardente: clouds of dust and ash as part of a pyroclastic flow.
+Lahars: mudflows, a type of mass wasting where soil is carried away.
+Eruption types:
+Hawaiian: least explosive, eruption of basaltic material.
+Strombolian: moderate gas and viscosity.
+Vulcanian: higher viscosities, short lived eruptions.
+Plinian: most destructive, highly explosive eruption.
+Phreatomagmatic: magma interacts with water, increasing dissolved gas concentration and leading to more explosive eruptions.
+More volcanic activity (such as faster seafloor spreading) means it's hotter.
+Folds
+Folds form due to compression and shearing of the crust.
+
+Domes and Basins form due to up or downwarping of strata following compression. 
+Plunging folds still have a vertical axial plane.
+
+Isostatic Rebound
+Isostatic rebound occurs due to the removal or addition of weight to the crust, either causing subsidence or rising.
+Subsidence can occur if a heavy weight is added. 
+Opposite of those below.
+Rising can occur if a heavy weight is removed.
+Erosion of a mountain range, melting of a glacier.
+Crustal shearing due to extensional faults.
+Heating of lower crust (via mantle plumes or some other mechanism.
+Delamination of crust.
+Leads to partial melting of crust (crustal anatexis) or delamination.
+
+Mountains are typically characterized by thick crust, while delamination events lead to thinning of the crust.
+Isostatic rebound can also occur due to differential pressures on crust: adding weight to one reason could cause it to subside and result in corresponding rising in another region (called lithospheric flexure).
+Erosion and Deposition
+Wind
+Wind sorts sediment the best.
+Deflation:
+Wind removes smaller sediments by erosion, leaving behind bigger cobbles which are too big to be eroded.
+Movement occurs via saltation, suspension, or surface creep. 
+Creates desert pavement in arid environments.
+Can also produce blowouts.
+Abrasion:
+Grains carried by wind erode by abrasion.
+Can produce polished surfaces such as ventifacts or larger structures such as yardangs.
+Wind erosion can cause dunes, ripple marks, loess, or cross bedding.
+Loess is a very fertile soil because it can hold a lot of water. 
+Water
+Streams:
+The stream directly exerts pressure on the beds beneath it, leading to downcutting.
+Sediment is transported in streams in either the suspended, dissolved, or base load.
+Hjulstrom curve shows sediment erosion patterns:
+Alluvial fans form at the base of mountains where the gradient of a stream greatly decreases, causing it to deposit larger sediments.
+Deltas are similar to alluvial fans, but they form as a river empties out into an ocean, leading them to decrease their flow velocity and deposit sorted sediment.
+High energy depositional environment: dominated by big sediments, include rivers or beaches. Low energy environments have small sediments, include lakes or marshes.
+Waves:
+Waves erode via abrasion mainly.
+
+Beach faces migrate over time due to the erosion of waves. 
+Longshore currents form due to the refraction of waves as they approach the shore, and cause longshore drift as sediment is eroded with the current.
+Turbidity currents are gravitationally bound currents that flow down the continental slope, and leave deposits called turbidites, which commonly exhibit graded bedding.
+Are density based currents, meaning that the mixing of sediment with the water mass increases the density and causes the current to flow downhill. 
+Similar to lahars and pyroclastic flows.
+Commonly form in foreland basins. 
+They do not form sorted deposits because the water flows so fast that there is little time for sorting to occur. However, the sediment is deposited coarse → fine because fine sediment remains in suspension longer so the sediment deposit shows graded bedding.
+ 
+Glaciers
+Glaciers erode via mainly plucking and abrasion.
+Plucking: glaciers carry sediment away trapped within the ice.
+Faster glacial movement, greater friction between the glacial bottom and the surface, and rock fragments contained within the ice all impact the level of erosion.
+Glacial outwash sorts sediment, while glacial till is not sorted since it is directly deposited by the glacier.
+Sorted depositional landforms: eskers, outwash plains, kames.
+Unsorted: glacial till, erratics, drumlins, moraines.
+
+
+
+
+Erosional landforms: 
+
+
+Mass Wasting
+Definition: The movement of rock and soil down slope under the influence of gravity.
+There are several types of mass wasting: 
+Creep: Occurs very slowly. Is solifluction if it occurs in permafrost. 
+Slump: Rotational sliding of soil masses, commonly occurs on oversteepened surfaces.
+Fall: When rocks fall.
+Debris flows: Flow of waterlogged materials, includes lahars.
+Mass wasting can produce talus slopes.
+
+Soil
+Characteristics
+Porosity: Amount of available pore space 
+Smaller grains have a lower porosity.
+Poorly sorted soil has a lower porosity than sorted soil.
+Permeability: the capacity of the soil to allow water to pass through it
+Bigger grains = higher permeability
+Connected pore spaces make soil permeable.
+Soils with high porosity and low permeability (clays) are good sources of water for plants. 
+Soil Horizons
+The E-horizon is leached, thus giving it a very light color.
+The B-horizon is typically rich in clays, and is reddish or orange due to the presence of oxides of iron. 
+Soil Orders
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Geologic Time
+Early Earth
+Hadean Era: Earth forms from a protoplanetary disk. Late heavy bombardment occurs at the end of the Hadean. Severe volcanism occurs due to the high geothermal gradient. 
+Archean Era: Earth has cooled significantly, but there is still no life (likely, could have been present near hydrothermal vents) due to lack of oxygen. Plate tectonics develops due to strong mantle convection. Cooling gradually leads to cloud formation, precipitation, and the growth of oceans. 
+3 atmosphere: 1)light gasses like helium and hydrogen, 2)co2 and greenhouse gasses dominate due to volcanism, 3)modern atmosphere, following great oxygenation event. 
+Proterozoic Era: Life develops into multicellular forms. Great Oxygenation event occurs. Snowball Earth (cold temperatures) occurs due to the decreased concentration of greenhouse gasses in the atmosphere  
+Paleozoic
+Cambrian: Eruption of biodiversity known as the Cambrian explosion. 
+Ordovician: Common life forms develop, trilobites dominate. Arthropods are the apex predators. Glaciation leads to a mass extinction event.
+Silurian: Life restored after the mass extinction. Fish begin flourishing, but arthropods remain at the top. Vascular plants develop.
+Devonian: “Age of the fish”. Plants rapidly diversify. First amphibians appear. Another mass extinction event; cause uncertain. 
+Carboniferous (Mississippian and Pennsylvanian): Very hot climate. Swamps dominate, lots of coal production. First reptiles evolve.
+Permian: Pangea forms. Very dry land. Ends with the Permian mass extinction, which was the most deadly in all of history. Generally considered to have been caused by volcanic outgassing from the Siberian traps. 
+Mesozoic
+Triassic: Pangea breakup, dinosaur evolution. Ends with another mass extinction event, caused by volcanic outgassing leading to ocean acidification and global warming.
+Jurassic: Dinosaur diversification. First true mammals develop, living small but gradually growing. 
+Cretaceous: Climate gradually cools from the Jurassic. Ends with the Cretaceous-tertiary mass extinction, caused in part by the asteroid impact.
+Cenozoic
+Paleogene: Modern mammals develop, continents begin assuming their modern positions. ACC forms, causing cooling by cutting off global circulation. 
+Neogene: Dramatic climate occurs, drying up large regions. New plants evolve, Australopithecus appears. 
+Quaternary: Ice-age trend appears. Giant mammals dominate for a time, but die out. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+HYDROLOGY
+Rivers
+Characteristics
+Capacity: The total sediment load that a stream can transport. 
+Competence: Largest sediment size that can be transported by a stream.
+Discharge: Amount of water that flows past a given point in a unit of time. Higher discharge correlates to higher capacity and competence.
+Flow velocity: Velocity of flow
+Gradient: The slope of the stream.
+Sediment loads:
+Bed load: Largest sediments that the stream cannot directly erode in the channel. Rather, they erode them via saltation, as the sediments bounce along the bed of the stream.
+Suspended load: Sediments carried in suspension by the river.
+Dissolved load: Dissolved ions that the stream carries in solution.
+The point of fastest flow on a stream is near the outer bank.
+Structures
+Stream erosion produces V-shaped valleys.
+Point bars form on the inside banks of meanders due to slower flow velocities there, and the river deposits sediments there.
+Cut banks form on the outer banks of meanders due to the faster flow velocity, thus causing erosion.
+Oxbow lakes: Form due to the cutoff of a meander as the river looks for a more direct path between two points. 
+Tributaries: Smaller channels that merge with stream.
+Yazoo Tributaries: channels that flow parallel to the main stream but cannot merge due to resistant sediment ridges blocking their path.
+Distributaries: Smaller channels that separate from the stream. Commonly form at river deltas, as the river enters coastal flatlands. 
+Drainage basin: The area that supplies the water for a region. These are separated by drainage divides, which are often mountain ranges or high ridges.
+Floodplain: Layers of sediment formed by successive flooding events.
+Stream terraces: Elevated floodplains formed by the downcutting of rivers, thus elevating the floodplains around them.
+Levees: Ridges of sediment on the banks of a river formed by flooding events.
+Knickpoint: A point where the gradient of a stream changes sharply. 
+Is indicative of base level change, likely form incised valleys.
+Drainage patterns:
+Dendritic: The most common drainage pattern, resembles a tree. Forms in regions of uniform sediment and uniform erodibility.
+Annular: Form in basins or domes with differential erosion.
+Trellis: Form where rocks have been folded and differentially eroded. Differential erosion is common. 
+Rectangular: Form in regions of clear bedding planes, fractures, and highly jointed rocks. 
+Centripetal: Form in a basin as water flows towards the center. Opposite of radial.
+Parallel: Formed in regions of steep slopes with minimal relief. 
+Radial: Water flows away from a central dome. Forms on volcanoes or domes. 
+Deranged: No clear drainage pattern. Flow appears random.
+Evolution and Types
+Streams erode their base via downcutting, and lengthen their channel via headwater expansion.
+Rejuvenation: The base level of a stream is lowered (glacial period), so the stream reignites downcutting.
+Streams initially focus on downcutting, so young streams will flow relatively straight out of high mountain ranges.
+Then, they widen their river valley when they reach land with a lower gradient.
+Discharge increases as you move downstream because more tributaries merge with the stream.
+Perennial streams: Streams that flow all year.
+Ephemeral streams: Streams that only flow after a major rain event. Can cause flash flooding.
+Intermittent/seasonal streams: Flow during certain seasonal events, such as the monsoon season.
+Superposed streams: Are seen flowing through mountain ranges. The reason that the flow through these ranges and not around them is the stream initially eroded through flat bedrock, revealing the mountains that had been covered by sediment. They then cut narrow valleys through the mountain range, thus creating the superposed stream. 
+Basically “superpose”  themselves onto previously hidden landforms. 
+Antecedent streams: These streams formed on uniform terrain, and then uplift occurred. During uplift, they downcutted at the same rate as the uplift, thus allowing them to maintain their original path through the mountain range.
+Diverted streams: These streams originally had a path towards something, but then the uplift of land caused them to be diverted from their original path as they did not erode fast enough. 
+Stream piracy: Stream piracy occurs when the flow of one stream is diverted into another stream, causing the first stream to be “captured” by the second stream. Can occur due to sea level rise, tectonic uplift, glacial damming, or headwater erosion.
+Gaining streams: Have the water table above their base, so water continually flows into them.
+Losing streams: Water table is below the base of the stream, so they lose water to the groundwater.
+ 
+Braided streams: Streams that branch off into many smaller distributaries that form and reform due to the presence of small ridges of sediment that divide the river. Form in rivers with coarse grains and high sediment loads, when a threshold level of sediment is reached. 
+Anastomosing streams: Form when the downstream base level rises, causing a rapid buildup of sediment. Since bank materials are not easily erodible, the original single-thread stream breaks up into multiple channels. Streams entering deltas in a lake or bay are often anastomosed.
+Stream flooding is an important process because it redistributes nutrients that are stored in the river to the soil, increasing soil productivity. 
+Rivers are the main source of nutrients like nitrogen and phosphorus for the soil. 
+Glaciers
+Structures
+Glaciers are divided into several types:
+Ice Sheets: Continental scale bodies of ice. Only two exist: Antarctica and Greenland.
+Ice Caps: Small ice sheets that collect in high altitude regions.
+Alpine glaciers form in high altitude regions. When they flow out into lowlands, they spread out and become piedmont glaciers.
+Freshwater Glaciers: Are found in tidal regions, calving of these produces icebergs.
+Glaciers characteristically produce U-shaped valleys.  
+Glacial landforms:
+Crevasse: Cracks in the glacier. 
+A Bergschrund is a wide crack that separates flowing ice from stagnant ice.
+Cirques: Divots carved out by glaciers via plucking and abrasion.
+Hanging Valleys: Formed by a smaller glacier that gradually merges with the bigger glacier.
+Fjords: Form when glaciers flow through narrow inlets to the ocean. Produce steep-sided walls.
+Nunataks: Nunataks are rocky islands surrounded by flowing glaciers. Can eventually become a medial moraine if the two glaciers combine.
+Aretes: Rocky ridges that form as a result of glacial erosion. Low points on aretes are called cols.
+Horns: Form when three glaciers carve out a steep sided point. Have a rather distinct pyramidal shape.
+Moraines: Glacially transported rock and debris. 
+Lateral: Form on the edges of glaciers.
+Medial: Form at the confluence of two glaciers.
+Terminal: Forms at the terminus of a glacier. Marks the furthest reach of a glacier at a given time. If a glacier remains in one sport for a long time, it produces a large terminal moraine. Therefore, the size of a terminal moraine indicates the recession rate of the glacier, with a larger terminal moraine showing a slower recession rate. 
+Recessional moraines: Form as the glacier recedes, are small moraines.
+Ground: Accumulate at the base of glaciers.
+Till & flour: Till are large sediments deposited by glaciers, while flour is much finer. Both are unsorted.
+Erratics: Large rocks deposited by glaciers that appear out of place with the underlying bedrock.
+Striations: Abrasive marks produced by rocks that the glacier is eroding. Can be used to determine glacial flow direction. 
+Chatter Marks: Wedge shaped chipping marks produced by the abrasive action of glacially eroded rocks. Glacial flow is perpendicular to the chatter marks and the tips of the chatter mark point in the opposite direction of glacial flow.
+Outwash plains:  Form in front of receding glaciers as they melt. Expansive plains with sorted sediment, often characterized by braided streams. 
+Kettles: Kettles are depressions formed when a body of ice detaches from a glacier and gradually melts, leaving behind a pit that is filled with water. 
+Paternoster lakes: Form in glacial valleys where the glacier carved out small divots that were later filled with water.
+Drumlins: Hills of sediment that have been streamlined by glacial flow. Often occur in fields. The shallower side points the direction of glacial movement. 
+Eskers: Meandering ridges of sediment deposited by a glacier as it moves. 
+Kames: Knobs of sorted sediment produced by a receding glacier. 
+Roche Moutonnee: Form when a glacier erodes pre-existing bedrock. Steeper side points in direction of glacial movement.
+ 
+Movement
+The speed of glacial movement is primarily determined by the amount of friction it has with the ground. 
+Lots of glacial meltwater decreases friction by lubricating the ground and thus increases the speed of the glacier.
+The fastest regions in a glacier are the top middle.
+Bottom is slowed down by contact with the ground, sides are slowed by contact with the valley walls.
+Basal slip: Sliding of the base of a glacier along the ground.
+Plastic deformation: Deformation of the ice occurs at a depth below 50 meters, where the pressure of the above ice is sufficiently high. 
+The upper 50 meters are rigid since they do not experience the same high pressures. 
+Large blocks of ice like ice shelves help to hold glaciers in place. When they are melted, they can stop the buttressing effect that holds the glacier in place and can cause rapid movement, which can sometimes amplify melting.
+Lakes and Estuaries
+Types of Lakes
+Tectonic lakes: Form from the activity of faults that create a lake.
+Could be from faulting (like a graben), or just warping of the surface due to tensional forces like rift valleys. 
+Often in grabens, saline lakes form due to the lack of influx of freshwater which leads to the buildup of salts.
+Volcanic lakes: form in the calderas of volcanoes. 
+Glacial lakes: Form in cirques or other erosional features of glaciers.
+Solution Lakes: Form when water dissolves a region of land, often in karst regions.
+The resulting basin is filled with water and forms a lake.
+Can often form in caverns underground after erosion of limestone by water.
+Lakes can also be classified based on thermal stratification
+Holomictic: the lake has a uniform density and temperature throughout. Well mixed, not stratified.
+Meromictic: The lake is composed of distinct layers that do not mix. Poorly mixed, stratified. 
+Dimictic lakes undergo two overturning cycles each year: once in the spring, and once in the fall.
+Monomictic lakes overturn once per year. It depends on the region when they overturn, warm regions have overturning in fall, cold regions have overturning in spring.
+Meromictic lakes are stratified for long periods of the year, while polymictic lakes are well mixed lakes that do not exhibit thermal stratification because they are relatively shallow.
+Structures and Processes
+Lake layers: 
+Epilimnion: Upper, unstratified layer. Well mixed by winds and is thus uniform in temperature and density.
+Metalimnion: Equivalent of a thermocline or a pycnocline in the ocean. Is characterized by a drop in temperature and an increase in density. Prevents mixing between the upper and lower layers.
+Hypolimnion: Lower, cold layer of a lake. Typically cold, dense, and anoxic. 
+Overturning:
+The downwelling of surface water and the upwelling of deep water in a lake.
+Essentially inverts the epilimnion and the hypolimnion.
+Overturning typically happens twice a year with the big changes in temperature that cause upwelling or downwelling, and lakes tend to be well-mixed between these two periods. 
+Autumn turnover: Typically caused by cooling of surface water which causes the hypolimnion to upwell and recirculates nutrients and oxygen throughout the lake. 
+Upper layers are oxygen rich, lower layers are nutrient rich because of decomposition. Lower layers are typically also rich with toxic gas produced by decomposition.
+Spring turnover occurs as the lake becomes stratified with warming of the upper layers.
+
+Lake stratification can be affected by short term events as well as long term cycles.
+Heat waves can cause stratification by heating the upper layers and thus stratifying the lake.
+Influxes of freshwater such as rainstorms or high river discharge can mix a lake and cause stratification to break down. 
+Sediments in lakes can highlight aspects of past conditions.
+Are composed of mainly low energy sediments, but can contain high energy sediments during periods of flooding. Coarser sediments can be found near the banks of lakes. 
+Are often sources of coal, oil, or other natural resources. 
+Enrichment of sediments with oxygen can be indicative of strong mixing and good conditions, and similar relations can be deduced for other nutrients.
+Types of Estuaries
+Based on geology: 
+Drowned River Valleys: Form where a river meets the ocean as the mixing of fresh and saltwater creates a brackish environment. The topography of the estuary is similar to that of a river mouth.
+Bar-built estuaries form where the deposition of sediments creates shallow regions where fresh and saltwater mix. They tend to form in stable regions, i.e. passive margins, and are extensive at depositional shorelines such as the Eastern US.
+Fjords: When a glacier retreats, the meltwater and the seawater mix to create an estuary. They are typically strongly stratified due to a lack of mixing mechanisms present. 
+Tectonic estuaries: Can form when faulting causes subsidence of land. Inundation of the subsided land can create an estuary. The San Francisco bay is an example.
+ Based on water circulation: 
+Salt Wedge: Freshwater influx creates a layer that saltwater moves under because it is more dense. Such estuaries are stratified and have strong internal waves due to a strong pycnocline.
+Partially mixed and well-mixed estuaries are less stratified due to decreased freshwater influx and greater tidal impact via mixing. 
+Inverse estuaries form in dry regions, where heating of the surface layer causes salinity to increase because of evaporation. Water flows towards this salinity maximum, where downwelling occurs.
+Vertically mixed: Estuary is well mixed, water is isohaline in a column. Salinity is highest near the ocean and lowest at the furthest point from the ocean, with vertical isohalines. 
+Structures and Sediments
+Stratification of an estuary is dependent on the degree of mixing between the saltwater and freshwater present.
+Strongly stratified = no mixing.
+No stratification = strong mixing. 
+Tidal forces are an important source of mixing for estuaries. 
+Events such as hurricanes can cause rapid mixing and destratification of an estuary with the accompanying storm surge. 
+Estuaries are important for filtering sediments, as sediment size decreases as you move away from the water influx (depending if it is freshwater or saltwater dominated). 
+Oceanography
+Geologic
+The Wilson Cycle shows the opening and closing of ocean basins:
+Reefs:
+Oceanic plate tectonics: 
+Magnetic pole reversals provide evidence for seafloor spreading. 
+Pole wandering: apparent effect where the magnetic north pole gradually migrates or “wanders”. 
+Metallic minerals such as hematite or magnetite preserve the orientation of the north pole in their rock layers. 
+When the magnetic field reverses, a new stripe with the new polarity forms.  
+Fracture zones are extensions of once active transform faults, and display past seismic activity.
+Ophiolite complexes are sections of oceanic crust that have been emplaced onto continental crust. They often form in the forearc of subduction zones and become lifted onto a continental arc. 
+The outflowing of lava at mid-ocean ridges produces pillow basalts. 
+As you move further from the mid-ocean ridge, age increases, sediment cover thickens, and density increases. Faster spreading means that there will be a shallower subduction angle at trenches because the plates are younger and less dense when they reach the trench. This produces a larger forearc basin and a smaller backarc basin, with slower spreading. 
+Hydrothermal vents form where outgassing from the mantle creates a vent in the oceanic crust. 
+Warm water vents: Have water temperatures between 86 F and emit clear water. 
+White smokers: Have water temperatures from 86 F to 662 F and emit white water due to the presence of light colored compounds, like carbonates or silicates.
+Black smokers: Have water temperatures over 662 F and emit dark water due to the presence of metal sulfides.
+Marine Transgression and Regression
+Transgression: Sea level rise. Characterized by the presence of finer sediments above coarser sediments because deposition slows. Causes include global warming, tectonic subsidence of land, or isostatic rebound. Sandstone → shale → limestone
+
+
+
+Regression: Sea level fall. Characterized by coarser sediments above finer sediments because deposition speeds up. Could be due to glaciation or tectonic uplift of land. Limestone → sandstone → shale
+Physical
+Sediments
+Lithogenous: Form from the weathering and erosion of rocks. Dominates the continental shelf. Examples include abyssal clays and turbidites.
+More heavily composed of more stable minerals, like quartz.
+Biogenous: Form from the hard parts of organisms, such as shells.
+Silicious: Form in regions with high productivity, where upwelling is common. This is because siliceous ooze dissolves, so it has to be rapidly produced to remain on the ocean floor. Organisms that form this include radiolarians and diatoms.
+
+Calcareous: Form from the CaCO3 shells of organisms like coccolithophores or coral reefs. Dominate mid-ocean ridges since they are above the CCD.
+
+Hydrogenous: Sediments that form from dissolved compounds in water. Include manganese nodules or oolites.
+Presence of deep sea clays and sulfides indicates low productivity, while presence of siliceous minerals and rocks like chert indicates high productivity.
+Clines
+Thermocline: Change in temperature with depth. Is highly pronounced in lower latitudes and absent in poles.
+Halocline: Change in salt with depth. Highest salinity occurs at 30 degrees latitude due to high evaporation. Some polar regions have high salinity due to brine rejection, but it is mostly low salinity due to runoff and iceberg melting. Equator has low salinity due to high amounts of precipitation.
+Pycnocline: Change in density with depth. Is dependent on halocline and thermocline. Temperature has a greater influence on density. Serves to divide high and low density waters. High temperatures at low latitudes create low density surface waters, while pycnocline is basically absent at high latitudes because they are isothermal.
+Lysocline: Change in dissolution of calcium carbonate with depth. Marks the region where dissolution sharply increases. Continues increasing until the CCD, when all calcium carbonate is dissolved in water.
+The solubility of CO2 and other gasses increases with depth due to the increased pressure. 
+pH: Is slightly basic at surface due to influx of freshwater, then evens out at depth. 
+Carbonate buffering slows the change of pH of ocean water.
+
+Characteristics of the seafloor: 
+Continental Margins:
+Passive: Not near any plate boundaries. Lack tectonic activity like mountain building or earthquakes. Thick accumulations of sediment at these regions due to lack of erosional agents can cause subsidence.
+Active: High degree of tectonic activity. Marked by trenches, volcanoes, etc.
+Continental shelf: Essentially part of the continent. Granitic crust. Very flat. Wider continental shelves form at passive margins. During glacial periods, sea level retreat reveals more of the continental shelf.
+Continental slope: Beyond the shelf break, relief steeply increases and forms the continental slope. The slopes are steeper at active margins due to the presence of trenches and other marine features. The continental shelf is often marked by submarine canyons formed by turbidity currents.
+Continental Rise: An intermediate region between the continental slope and the abyssal plains. Are composed of turbidite deposits from turbidity currents, and exhibit normal grading. Larger rises are formed at passive margins because of reduced erosional activity at these boundaries.
+Abyssal plains: Composed of fine sediments that settled on the plain over time. Are more common in ocean basins with passive margins because the sediment is not continually eroded by subduction forces at active margins. 
+During times of more rapid seafloor spreading, ocean level is typically higher because the crust is younger → less dense. 
+Supercontinents normally have slower seafloor spreading rates and lower sea surface heights.
+Ocean Circulation
+Ekman Transport
+Wind blowing over water deflects the water.
+45 degrees right in the Northern hemisphere, 45 degrees left in the Southern hemisphere.
+Lower waters are deflected 90 degrees in the same direction due to friction and drag forces.
+
+The deflection of water away from the coast causes upwelling, and if it is deflected towards the coast it causes downwelling.
+Upwelling  = high productivity = siliceous sediment.
+Likewise, the deflection of water may cause divergence(low pressure systems), causing upwelling & cold water, while the deflection of water at high pressure systems causes convergence and downwelling.
+This causes equatorial upwelling and creates regions of high productivity.
+
+Langmuir Circulation: 
+Circulation system created by Ekman transport.
+Is formed by the constant blowing of wind across a body of water, which creates alternating regions of upwelling and downwelling.
+Was first observed due to the presence and distribution of windrows(rows) of seaweed in the sargasso sea. These windrows form at zones of convergence as water accumulates in long lines.
+They form within the surface mixed layer (not large scale)
+Surface Currents
+Circulation in the oceans occurs mainly in gyres in each of the 5 main oceans.
+Currents are driven by wind. 
+Clockwise gyres in the northern hemisphere, counterclockwise in the southern hemisphere.
+
+The large amount of water driven west by equatorial currents leads to a buildup of water there, which flows back as an equatorial countercurrent.
+Geostrophic currents in the ocean would flow in a balance between the coriolis effect and gravity, but friction means that these currents flow down the slope. 
+Most oceanic currents are roughly geostrophic.
+
+
+The centers of gyres are shifted to the left (in the Northern hemisphere, right in the southern) due to the coriolis effect.
+Western currents are thus faster, deeper, and narrower, while eastern currents are the opposite. Eastern boundary currents are commonly associated with coastal upwelling.
+Convergence of water due to Ekman transport causes downwelling in the centers of gyres.
+Prominent Currents
+Gulf Stream
+A warm current at the western boundary of the North Atlantic gyre. 
+The Sargasso sea occupies the region in the center of the gyre where water is stagnant.
+Is responsible for warming the climates of western North America and Europe. 
+Meanders in the Gulf stream lead to the formation of warm and cold core rings. Warm core rings form when meanders pinch off north of the gulf stream, while cold core rings form when they pinch off south. Cold core rings are nutrient rich, while warm core rings are regions of downwelling and poor productivity.
+Hurricanes traveling along the Gulf stream can be strengthened due to the warm water. 
+Eddies are very stable since water is not as turbulent as air. 
+Antarctic Circumpolar Current
+Ocean current that flows west to east around Antarctica. Also known as the West Wind Drift.
+Antarctic convergence occurs at the boundary between the ACC and other currents, and the convergence of water here causes downwelling. The cold antarctic water sinks below the much warmer water from other currents.
+The East Wind Drift, powered by polar easterlies, flows closer to the Antarctic coast. The water from this current is deflected towards the Antarctic coast by Ekman transport, while the ACC deflects water away. Therefore, between these two currents, a region of divergence and upwelling known as Antarctic Divergence exists. 
+Indian Ocean Circulation and Monsoons
+Monsoons occur in the summer in the Indian ocean due to the uneven heating of land and ocean. Greater heating of the land creates a low pressure system that has highly humid water swept into it, creating vast amounts of precipitation. 
+The reversal of seasonal winds that causes this system also causes the reversal of ocean currents that follow these winds. 
+Productivity is high during the summer monsoon because divergence of winds leads to upwelling off the coast of Africa. However, during the winter water is deflected towards the coast causing downwelling and poor productivity.
+
+Peru Current and ENSO
+The cold Peru current combined with the upwelling caused by the deflection of water away from the coast of Peru causes massive amounts of upwelling of the Eastern coast of South America and thus leads to high productivity.
+The thermocline is normally far deeper in the western Pacific than in the East due to the high buildup of warm water there with equatorial currents. 
+During El Nino years, a strong equatorial counter-current brings warm water back to the east, deepening the thermocline while simultaneously suppressing upwelling because of the less dense warm water. This coincides with a reversal of the trade winds that leads to increased SSTs in the Eastern Pacific.
+In contrast, La Nina conditions form during intensifications of normal conditions with a greater pressure gradient across the Pacific. This creates a shallower thermocline in the eastern Pacific and greater upwelling. 
+
+
+Deep Water Circulation
+Formation of water masses: 
+Brine rejection at polar regions creates high salinities. 
+The cold water sinks and stratifies in terms of depth. 
+Upwelling and downwelling occurs easily at poles because there is no pycnocline.
+AABW forms off the coast of Antarctica due to the deflection of the East Wind Drift, while AIW forms in the region of Antarctic Convergence. 
+The MIW is so dense because it is so salty due to the high evaporation rates of the region combined with low runoff rates in the area. 
+Climate change is leading to vast amounts of freshwater runoff in polar regions, thus decreasing the salinity of these waters and potentially disrupting the formation of the deep waters by restricting their downwelling. 
+
+Thermohaline circulation: 
+Circulation of upwelling and downwelling based on density differences in water.
+
+Cold water can hold more nutrients and dissolved oxygen (because low primary productivity means nutrients aren’t used by producers), so the recirculation of this water through the ocean is important for marine organisms. Less salty water also holds more nutrients and dissolved gasses. 
+The Atlantic Meridional Overturning Circulation (AMOC) is an important part of thermohaline circulation in the Atlantic, consisting of polar transport of surface water and equatorial transport of deep water. 
+Sequesters CO2 in deep water, causes downwelling in the Antarctic, maintains climate conditions, etc.	
+Waves
+Formation
+Waves form as the result of disturbances of ocean water.
+Potential disturbances include wind, earthquakes, landslides, asteroid impacts, or other things. 
+Waves at the ocean surface are orbital waves as the particles move in a circular motion. 
+Waves have several characteristics: 
+The wave height is defined as the distance between the crest and the trough of a wave. 
+The steepness of a wave is the wave height divided by the wave length.
+When this exceeds 1/7, the wave breaks because it is too steep to support itself.
+The wave base is the lowest point that the orbitals reach in circular orbital motion. It is equal to ½ of the wavelength below the still water level. 
+Wave energy is determined by 1)The fetch, 2)the duration of wind blowing over the region, and 3)the wind speed
+Greater energy in a wave increases the wave height and wave steepness.
+As waves approach the coast, the water depth decreases and waves gradually transition from deep water to transitional to shallow-water waves. 
+
+Wave refraction occurs as waves approach the coast because parts of the wave feel bottom and slow first, causing the wave to curve. 
+
+Types
+Surface waves form at atmosphere-ocean interfaces as the result of wind, while internal waves form along the pycnocline due to density differences creating oscillations in the water 
+Deep water waves are those where the water depth is greater than the wave base.
+Perfectly circular wave motion.
+Transitional waves are those where the water depth is between ½ wavelength and 1/20 wavelengths.
+Slightly elliptical wave motion.
+Shallow water waves are those with a water depth less than 1/20 wavelengths.
+Highly elliptical wave motion.
+Capillary waves: small wavelets that form due to wind blowing over water. Are commonly called ripples.
+Constructive interference of waves can produce massive waves called rogue waves, which are much taller than surrounding waves.
+Breaking waves:
+Plunging: Curling crest moves over a moderately sloped ocean floor.
+Spilling: Turbulent mass of air and water runs down the wave as it breaks. Form over a gradually sloping ocean floor that allows for the gradual dissipation of energy over a long lifetime.
+Surging: Form over an abrupt slope in the ocean floor, where large amounts of energy are dissipated over a short period of time. 
+Tsunamis:
+Form due to sudden changes in ocean floor topography, such as earthquakes or landslides.
+Have a long wavelength, and low amplitudes in the deep ocean before rapidly growing as they approach the coast. 
+The approach of a tsunami is associated with a rapid withdrawal of water before the water rushes back towards the coast in a seemingly very high tide, hence the name “tidal waves”.
+Tides
+Formation
+Tidal formation is based on the interaction between centripetal and gravitational forces, which create the tidal bulges on Earth. 
+
+In an ideal system, the water follows the tidal bulges of the moon, creating two low tides at the zenith and the nadir. 
+
+In a semidiurnal tide pattern, high tides occur every 12 hours and 25 minutes because they follow the lunar day. 
+The declination of the moon, as well as the fact that both the moon and the Earth follow elliptical orbits change the tides from day to day. Greater tidal ranges occur in January (during perihelion), as well as during perigee. 
+Amphidromic points: Points in the center of the ocean that all tides seem to orbit. These points have basically no tidal range.
+Radiating from all of these points are cotidal lines, which connect points that experience high tide simultaneously. 
+Cotidal lines rotate around amphidromic points due to the coriolis effect.
+
+Continents affect tidal patterns by blocking the free flow of water from one region to the other. 
+Moving into shallower waters near continents also affects the magnitude of tidal range.
+Types
+Spring tides: When the moon is new or full so that it is in line with the sun. Their forces combine to create higher tidal ranges.
+Neap tides: When the moon is at 1st or 3rd quarter so that its forces are perpendicular to those of the sun. 
+Spring tides coinciding with perigee produce proxigean tides.
+Tidal Patterns:
+Diurnal: One high tide and one low tide per day.
+Semidiurnal: Two high and low tides per day of equal height.
+Mixed: Two high and low tides per day of varying heights.
+
+
+
+
+
+
+
+
+
+
+Groundwater
+Structures
+Porosity
+The amount of pore space in sediments. 
+Is dictated by many factors.
+Sorting: more sorted = less porous.
+Angularity: more angular sediments = less porous
+Compaction: more compact = less porous.
+Grain size does not affect porosity in general, but smaller grain sizes tend to have lower porosities because of clumping of soil. 
+Permeability
+The ability for water to move through sediment.
+Influences: 
+Grain size: Larger grain sizes have higher permeabilities. 
+Connectedness of pore spaces: More connected pores allows for easier flow of water. This makes jointed rocks more permeable than less jointed rocks.
+Groundwater regions: 
+Zone of Saturation: Region in soil where all pore spaces are filled with water.
+Unsaturated zone: Regions above the zone of saturation where all pore spaces aren’t filled.
+Water table: The upper limit of the zone of saturation.
+Capillary fringe: A region above the water table where pore spaces are partially filled due to capillary action. 
+
+
+Aquifers & Aquitards
+Aquifer: An underground region of porous and permeable rock that stores water. 
+Confined: Buried under an aquitard.
+Unconfined: easily accessible from the surface, not blocked by any confining layers. 
+Perched: An aquifer that is uplifted above the water table due to the presence of a confining layer beneath it. 
+Aquitards: Non-porous and non-permeable rock that restricts the flow of groundwater.
+
+Aquifers are recharged via percolation of rainwater into the soil. 
+Wells & springs
+Artesian: wells that bring groundwater to the surface without pumping. This occurs because the hydraulic pressure underground is sufficient to pump water to the surface. 
+
+Other wells require pumping because they do not have sufficient internal pressure.
+Springs form when the water table intersects the surface and creates a flow of water. 
+Karst Topography
+Karst topography forms in carbonate rocks due to their solubility in groundwater.
+This solubility occurs via the following reaction (limestone): 
+H2O	+	CO2	→	H2CO3
+CaCO3	+	H2CO3	→	Ca2+	+	2 HCO3−
+Here, water is reacting with carbon dioxide to produce carbonic acid, which then dissolves the limestone to produce calcium and bicarbonate ions.
+This dissolution often creates many indicative features in karst regions. 
+
+
+Groundwater Movement
+Groundwater generally flows parallel to contour lines on a topographic map, from higher elevations to lower elevations under the influence of gravity.
+The water table generally follows the shape of the above surface. 
+It gradually moves through the soil to the ocean or lakes. 
+Water infiltrates groundwater via the surface. 
+The more permeable sediment is, the more water will infiltrate the groundwater. 
+Urban areas, with lots of concrete and cement, have very poor permeabilities. This leads to large buildups of water on the surface that runoff to streams, and thus can cause flash flooding. 
+ Groundwater flow can carry pollutants with it and thus spread these pollutants via groundwater systems. 
+Wetlands
+Regions where the soil is constantly saturated with water. These regions have a very high water table.
+Often contain brackish water with a salinity intermittent to freshwater and saltwater.
+Examples include marshes, swamps, bogs, and fens.
+The waterlogged nature of wetlands makes them highly conducive to coal formation as the decay of organisms occurs very slowly. 
+Wetlands are important because they:
+Provide erosion and flood control by retaining water and thus slowing the flow rate.
+Provide habitats for many organisms.
+Help to purify water as they pass through wetlands slowly, allowing sediment to settle out.
+Reduce storm damage (such as hurricane storm surges) by absorbing some of the water and slowing its flow.
+Human Caused Problems
+Overdrafting
+The overuse of groundwater.
+Can lead to lowering of the water table and thus makes it more difficult to use this resource.
+Overpumping of wells creates a structure known as a cone of depression.
+
+Subsidence
+The overdrafting of groundwater removes water from pore spaces. 
+This water previously made the soil incompressible, but now that it has been removed the soil can be compressed. 
+This leads to the subsidence of land as soil is compacted. 
+Earthquakes can cause subsidence of land by consolidating loose sediment and thus leading to subsidence.
+Saltwater intrusion & salination 
+The intrusion of saltwater into groundwater degrades the quality of the groundwater. 
+The overdrafting of groundwater increases the risk of saltwater intrusion by lowering the water table and thus allowing the further intrusion of seawater into the soil.
+Groundwater can also become saline due to evaporation over time, leading to the accumulation of salts in the water. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+METEOROLOGY
+Atmospheric Structure
+Troposphere
+Lowest layer of the atmosphere.
+Site of most weather events.
+Temperature decreases with altitude.
+Clouds form here, bounded by the tropopause. 
+78% nitrogen, 21% oxygen, 1% argon and trace gasses.
+Stratosphere
+Houses ozone, a greenhouse gas.
+Toxic in the troposphere, but in the stratosphere it absorbs UV radiation.
+The atmosphere is stable because temperature increases with altitude, so clouds cannot overshoot the tropopause.
+The stratosphere is very stable so there is minimal turbulence. 
+Warming of the troposphere with increased greenhouse gasses causes cooling of the stratosphere because there is less radiation being re-emitted to space 
+Mesosphere
+Temperature decreases with altitude again. 
+Mesopause: Coldest point in the atmosphere.
+Very strong zonal winds and Rossby waves present. 
+Ionosphere: 
+Charged region of the atmosphere located in the mesosphere. 
+It has 3 layers, the D layer, the E layer, and the F layer.
+The lowest region, the D layer, reflects standard AM radio waves back to earth, and also severely weakens them due to absorption.
+At night, the D layer disappears, and the AM waves pass to the E and F layers. Here, they are reflected back and forth between the surface of the earth and these layers, able to travel 100s of km in this way.
+FM radio waves can pass through the ionosphere without being reflected.
+
+Auroras also form in this layer due to disturbances of the magnetosphere by solar wind. 
+Thermosphere
+UV radiation causes the disintegration of molecules and creates ions. 
+Temperature increases rapidly with height because molecules are moving so fast. 
+Water in the Atmosphere
+Saturation
+In a parcel of air, water is constantly evaporating and condensing. 
+When there are equal rates of evaporation and condensation, the parcel is said to be saturated. 
+Condensation primarily occurs when air is cooled. 
+Warm air has a higher capacity for water vapor than cold air.
+The condensation of water vapor releases heat and warms the surroundings, while the opposite occurs during evaporation. 
+Humidity
+Humidity describes the amount of water vapor in the atmosphere.
+Absolute humidity: mass(water vapor) / volume(air). 
+Varies with altitude because rising parcels expand and sinking parcels contract. 
+Therefore, it is not a very useful measurement and is not often used. 
+Specific humidity: mass(water vapor) / mass(air).
+Does not change with altitude, so is more useful. 
+Vapor pressure:
+The pressure exerted by water vapor in the air. 
+High vapor pressure indicates high amounts of water vapor, while the opposite relationship holds for low amounts of water vapor.
+Saturation vapor pressure: The pressure that water vapor molecules exert when an air parcel is saturated.  
+Increases with temperature because a higher amount of water vapor is needed to saturate the parcel. 
+Relative humidity: water vapor content / water vapor capacity
+Is equivalent to the actual vapor pressure / saturation vapor pressure.
+Varies with water vapor content and temperature.
+Increased temperatures increase the saturation vapor pressure and thus cause the relative humidity to decrease.
+The dew point is the temperature to which a parcel has to be cooled to be saturated (because saturation = 100% relative humidity, and cooling parcels decreases the saturation vapor pressure).
+High dew point indicates a high water vapor content since the air does not have to be cooled much, but a low dew point indicates the opposite. 
+Polar air is said to be dry because while the relative humidity is high due to the very low temperatures (and hence very low saturation vapor pressures), there is so little water vapor in the atmosphere. 
+Wet-bulb temperature: 
+Evaporation is a cooling process, it takes in heat.
+Therefore, the wet-bulb temperature is the lowest temperature that can be reached by evaporation.
+It will occur at saturation, when all evaporation possible has happened before condensation balances it out. 
+Dry-bulb temperature:
+Just a dry thermometer that measures the air temperature as it is.
+The difference between the wet and dry bulb temperatures is indicative of water vapor content in the air.
+High differences indicate low humidity, and vice versa. 
+When they are equal, the air is saturated, and the temperature at which they are equal is the dew point. 
+Condensation: Fog & Clouds
+Dew forms in mornings due to the cooling of air below the dew point, at which time condensation outweighs evaporation and there is thus condensation onto the grass and other bodies. 
+Is more likely to form on clear nights because more cooling occurs.
+Condensation nuclei are nuclei that provide a surface for water vapor to condense onto. 
+Volcanic ash, dust, factory emissions, etc.
+Fog:
+Condensation of water vapor onto low lying nuclei. 
+Greater concentrations of nuclei produce dense fogs. 
+Radiation fog: Forms at night as the ground cools by releasing radiative heat. The cooling of the ground increases the relative humidity and allows for condensation.
+Is characterized by a surface inversion, with a cool surface layer under a warmer layer above.
+Light wind can promote fog formation by allowing for mixing of the air mass, which increases the relative humidity.
+Often forms in valleys due to their low lying nature.
+Advection fog: Forms as a humid air mass moves over a cool surface, cooling the parcel and allowing condensation.
+Fogs near the pacific coast are of this type because moist air masses that passed over the ocean are carried onto land and cooled, producing the characteristic fogs.
+
+Upslope fog: Forms due to the adiabatic cooling of an air parcel as it moves up an orographic barrier, such as a mountain. 
+Evaporation fog: Forms due to the mixing of two air masses, which increases the humidity and promotes condensation.
+Steam fog: Cold air moves over warm water, allowing for condensation to occur as the cold air becomes saturated with water vapor.
+Clouds:
+Types: 
+High: Cirrus clouds and subtypes. Characterized by wispy tails blown by high altitude winds.
+Middle: Alto and subtypes. 
+Low: Nimbo and subtypes
+
+Lenticular clouds form in regions where there is a barrier that causes clouds to form in disk shapes.
+Mammatus clouds form in sinking air and thus hang on the underside of other clouds, such as cumulus clouds.
+Contrails form behind jets due to the condensed vapor they leave behind, where mixing of the hot air from the jets and the atmosphere causes condensation.
+Clouds with a lower base tend to reflect more heat and cause cooling, while clouds with a high base trap heat and cause warming of the atmosphere.
+High altitude clouds have cold tops, while low altitude clouds have warmer tops.
+Formation: 
+Clouds generally form as air rises, cools, and condenses.
+4 triggers for lifting: 
+Orographic lifting
+Convection: Once the warm rising air cools to the dew point, it condenses and typically forms a cumulus cloud.
+Convergence of air (low pressure)
+Frontal uplift
+Clouds suck water vapor in from surrounding areas through entrainment, leaving the regions between clouds with little water vapor. 
+Orographic uplift creates vast amounts of precipitation on the windward sides of mountains, while creating rain shadows on the leeward sides of mountains. 
+
+High winds at the tropopause create the anvil shape of cumulonimbus clouds.
+Atmospheric Stability: 
+Dry adiabatic rate: Rate at which an unsaturated parcel of air cools. Is about 5.5 degrees C/ km (10 degrees F / km).
+As a parcel rises and cools at the dry adiabatic rate, it approaches its dew point. At that point, it begins cooling at the moist adiabatic rate, of about 3.3 degrees C / km (6 degrees F / km).
+Cools slower because condensation releases heat.
+Is also not a constant value because it varies with temperature of the parcel.
+Absolute stability: The parcel is colder and denser than the surrounding atmosphere, so it does not rise. The environmental lapse rate is less than the dry adiabatic lapse rate.
+Low base clouds form in this atmosphere, since they do not rise and rather spread out horizontally.  
+
+Conditional instability: Environmental lapse rate is between moist and dry adiabatic lapse rate, so the stability is dependent on water content. 
+
+Absolute Instability: If the environmental lapse rate is greater than the environmental lapse rate, the environment is always colder than the parcel, so it will rise. 
+
+The atmosphere gets more stable as lower layers are cooled, to increase the environmental lapse rate. 
+Atmosphere is most stable at sunrise when the lowest surface temperatures are present.
+The sinking of air can produce an inversion known as a subsidence inversion because as the air mass sinks, the upper parts warm more than the lower parts, creating an area where the upper levels are warmer than the lower levels. Such an atmosphere is also very stable. 
+The mixing of air masses increases the environmental lapse rate, making it more unstable since the bottom of the air mass will warm while the top will cool.
+For air to become unstable it must cool slower than the surroundings.
+Cold air aloft increases the environmental lapse rate and therefore promotes instability.
+Precipitation
+The saturation vapor pressure of a water droplet is the pressure on that droplet when it is in equilibrium.
+Collision Coalescence:
+Occurs in tropical areas.
+Cloud must be a warm cloud (all regions are hotter than 32 degrees F)
+Larger cloud droplets fall slightly faster (higher terminal velocity) and stick to smaller droplets, thus growing in size. 
+Oppositely charged water particles coalesce easier and thus grow faster than like charged particles.
+Bergeron Process:
+Occurs in cold clouds, where parts of the cloud are below 0 C.
+Such water is called supercooled.
+
+Ice crystals grow through 1)deposition of water vapor directly onto their surface, 2)freezing of supercooled water, or 3)contact freezing, where supercooled water droplets come into contact with the ice nuclei and therefore freeze.
+The process of growth is known as accretion.
+Cloud seeding: Injecting condensation nuclei into clouds to promote condensation and precipitation.
+
+Hail grows in updrafts before being carried downward by downdrafts.
+Pressure & Winds
+Air Pressure Basics
+The differential heating of land creates high and low pressure systems.
+A warm column of air needs to be taller than a cold column of air to exert the same pressure since it is taller.
+Therefore warm regions have lower air pressure than cold air at the same altitude because warm air is less dense than cold air.
+However, by the same notion pressure decreases less rapidly as you move up a warm column of air than as you move up a cold column of air.
+
+Therefore, at H the air pressure is higher than it is at L, so warm air is associated with high pressure and cold air is associated with low pressure.
+Pressure Systems
+Surface and upper level charts show high or low pressure systems.
+Surface weather maps show air pressure as if all points are at sea level.
+These sea level charts show pressures at constant height; we can also draw charts showing constant pressures.
+
+On such maps, we draw contour lines that tell you at which elevation you find the given pressure. For example, on a 500mb map, the contour 5400m tells you that if you ascend to an altitude of 5400m, the air pressure at that point will be 500mb.
+A low contour line indicates low pressure because the given air pressure is closer to the surface. Likewise, a high contour indicates high pressure.
+
+At the surface, winds converge and low pressure systems rise and diverge, while the opposite occurs at high pressure systems.
+So, in the map above, in the region between L and H there is divergence of air, indicating a low pressure system at the surface with stormy weather, while the region directly below L has convergence of air with high pressure and fair weather. 
+Pressure systems dissipate because the convergence of air at low pressure systems gradually increases the air pressure, and likewise at high pressure systems.
+High pressure at the surface (divergence of air) = convergence aloft = low pressure. Opposite for surface low pressure systems.
+General Wind Info
+The pressure gradient force drives the movement of air that we recognize as wind.
+Closely spaced isobars on a map indicate high wind speeds due to the high pressure gradient, and vice versa for widely spaced isobars.
+The coriolis force directs winds to the right of their target in the northern hemisphere and left of their target in the southern hemisphere. It is always perpendicular to the direction of wind movement, and directly opposes the PGF in geostrophic winds.
+The magnitude of deflection increases with wind speed, proximity to the poles, and travel distance.
+Winds aloft tend to be in geostrophic flow, where the pressure gradient force is balanced by the coriolis effect, causing the winds to flow parallel to the isobars.
+For all winds, they flow with low pressure to their left and high pressure to their right (in the Northern Hemisphere, opposite in South).
+Centripetal forces are responsible for keeping air in circulation around pressure systems.
+Local Winds
+Local winds are greatly influenced by friction in the planetary boundary layer.
+Eddies form on the leeward side of obstructions. This turbulence often creates high amounts of wind shear.
+Thermal circulation helps explain most local wind systems.
+Warm regions have rising air, meaning low pressure, while cooler regions have sinking air, meaning high pressure. Wind blows from the cold high pressure system to the warm low pressure system.
+Greater temperature differences create stronger pressure differences and hence stronger winds. Therefore, sea breezes are strongest in the mid-afternoon, when temperatures are highest.
+Air flowing over an obstruction tends to form an eddy with a countercurrent flowing opposite the direction of the wind.
+In Florida, the convergence of sea breezes creates a low pressure band across the state, where thunderstorm formation is common. 
+Monsoons also form due to these temperature differences.
+In mountainous regions, warm air flows up the mountain during the day in a valley breeze(due to warming of the land which causes air to rise up the mountain), and cold air flows down the mountain at night during a mountain breeze(since the colder air sinks as it flows down the mountain).
+Katabatic winds form on elevated plateaus, because there is a vast buildup of cold air that rushes downhill.
+Are stronger in the winters because there is a greater land-sea temperature gradient.
+Chinook winds form in the Rocky Mountains. They form due to the adiabatic warming of winds as they flow down a mountain slope. 
+Sinking air carries with it qualities of the upper atmosphere, while rising air has qualities of the lower atmosphere. 
+
+
+Global Atmospheric Circulation
+Global Winds
+Hot air at the equator creates a low pressure system. 
+Rising air creates large amounts of precipitation.
+Convergence of air at 30 degrees creates high pressure systems.
+The polar front is the boundary where the westerlies meet the polar easterlies. 
+There is a greater pressure gradient in January than in July, so winds are stronger in the winter.
+Where strong winds concentrate into narrow bands aloft, the jet streams form.
+They exist at the subtropical high and the subpolar low. 
+The polar front and subtropical front are boundaries between air masses of different temperatures; as such, there are rapid changes in pressure in these regions. This sudden change in pressure provides the energy for the formation of the jet stream.
+The jet streams also migrate with pressure systems, moving south in the winter and north in the summer.
+Winds are stronger in the winter due to higher pressure gradients (colder northern latitudes and roughly the same temperature at southern latitudes).
+Wind speed increases as you increase in altitude because the gradients strengthen, reaching a max at the tropopause.
+The jetstreams are strongest in the winter  and weakest in the summer as a result of this.
+Global Pressure Systems
+There are semi permanent pressure systems around the globe that only have small variations in their position throughout the year.
+Atlantic: Bermuda high, Icelandic low
+Pacific: Pacific high, Aleutian low.
+High pressure systems form due to the convergence of air aloft and sinking.
+In the summer, as the ITCZ migrates north, pressure systems migrate north as well, while the opposite happens in the south.
+
+The Hadley, Ferrel, and Polar circulation cells are a by-product of the coriolis effect, which creates this circulation.
+Changing Earth’s rotational period (day length) changes the number of cells and their strength because faster rotation will create a stronger coriolis force and more cells (like Jupiter).
+ENSO
+Normally, southerly winds off the coast of Peru create vast zones of upwelling that create productive regions in the ocean. 
+Every few years, a high pressure system develops over Indonesia and a low pressure system develops over the Western Pacific; as a result, the trades reverse and a strong equatorial counter-current forms, which pulls warm water from Indonesia to the Western Pacific. As a result, the upwelling is deterred and warm water builds up in the Western Pacific.
+La nina events occur when normally existing pressure conditions deepen and create colder waters than normal off the coast of Peru. Such conditions create even more productive water.
+During El nino conditions, a trough forms over the Northern Pacific and the subtropical jet streams carry wet weather to the southern regions of the US. The polar jet stream weakens, creating warmer weather across the northern US, while the subtropical jet stream strengthens.
+By contrast, during La Nina conditions, a ridge forms over the Northern Pacific, shifting the subtropical jet northward and bringing wet weather to the Northern US. Winter months during the southern US are warmer than usual.
+
+PDO:
+Positive phase: Greater pressure differences. Aleutian low deepens. Leads to more Pacific storms along Alaska and California, along with warm water buildups off their coast. 
+Negative phase: Cooler than average surface waters off the Pacific coast, Aleutian low is not as deep. Winters are colder and wetter over the Northwestern US.
+
+NAO:
+Positive phase: icelandic low and bermuda high strengthen, thus creating stronger westerly winds. Strong storms follow these winds to Northern Europe, keeping the US relatively mild. 
+Negative phase: weaker pressure differences weaken westerly winds. More storms in the US.
+
+Arctic Oscillation:
+Positive: strong pressure differences create strong westerly winds that prevent mixing of arctic and subtropical air, keeping the region below the polar front warmer and regions above the polar front colder.
+Opposite happens during the negative phase, with colder air penetrating deeper into the south due to lesser pressure differences.
+
+Weather
+Air Masses and Fronts
+Cold air masses from the north are partially the cause for the cold temperatures in the Northern regions of North America.
+Fair weather typically accompanies cold air masses because they are stable and therefore do not promote storm formation.
+There can be temperature inversions where air temperature rises with altitude in cold air masses.
+Lake effect snows: Form when a cold, dry air mass forms over a warmer body of water. Evaporation and rising of air creates clouds, and when they move off the lake back onto colder land, precipitation occurs due to the cooling.
+
+A front is the boundary between two air masses. 
+Cold fronts are accompanied by:
+Low pressures as the front approaches, reaching a minimum as the front passes through the region, and rising after (makes sense because cold air = low pressure, front has the highest gradient).
+Clouds and precipitation immediately after passing due to frontal lifting of warm air mass, clearer skies after.
+Dew point decreases sharply because cold air can hold less water vapor than warm air.
+
+
+Warm fronts are much shallower than cold fronts. They form when warm air replaces retreating cold air in a region, and are accompanied by: 
+As the front moves into the area, warm air overruns cold air and rises over it, producing precipitation. This also produces a temperature inversion(frontal inversion).
+Dew point rises because warm air can hold more water vapor.
+Pressure decreases due to mixing of cold and warm air.
+Occluded fronts:
+Cold occlusion: Cold air catches up to warm air, rams under it, and forces the warm air upwards. Is similar to a warm front in conditions.
+Warm type occlusion: Moist, less dense cold air rises over warm air.
+Thermal advections occur due to the horizontal movement of an air mass into a new area.
+A positive advection implies that a higher value of a quantity is moving in a region with a lower value, while the opposite is true of a negative advection. 
+Cold advections occur when cold air masses move into an area, while the opposite occurs when a warm air mass moves into an area. 
+Surface warm air advections can initiate instability and cause air to rise, while the opposite can occur with surface cold air advections.
+Warm advections cause this because the warm air that moves into a region is less dense than the surrounding air and causes rising. 
+Cold advections create stability because the cold air mass wants to stay where it is. 
+Upper level advections function in the opposite way (cold air advections initiate instability and cause air to rise).
+Because the cold air aloft wants to sink and forces air at the surface to rise to compensate for the sinking air. 
+Opposite occurs when warm air moves aloft. 
+Positive moisture advections create rain showers, while negative advections create dry periods. 
+Positive vorticity advection can strengthen low pressure systems, while negative vorticity advection weaken low pressure systems and strengthen high pressure systems because they counteract the rotation of the system. 
+Severe Weather
+Mid Latitude Cyclones: 
+Development begins along the polar front. 
+Under the right conditions, a kink forms in the polar front that becomes a frontal wave.
+
+The warm sector of a mid latitude cyclone forms between the warm and cold fronts, and is marked by precipitation.
+As winds flow over mountain ranges, air tends to curve cyclonically and produce lee side lows. 
+Cyclogenesis often occurs here.
+Northeasters are a type of mid-latitude cyclone that form near Cape Hatteras, a low pressure system. They then move up the coast towards the northeast, hence the name.
+
+In a mid-latitude cyclone(and all pressure systems), there exists a low pressure system aloft that trails the surface low (i.e., to the west).
+
+Longwaves, kinks in the polar front, are called Rossby Waves. The troughs represent low pressure systems, while the ridges represent high pressure systems.
+Troughs deepen during the passing of a shortwave, a small trough in the polar front, which initiates the formation of a mid-latitude cyclone.
+
+Thunderstorms
+Thunderstorms are convective storms involving rising air. 
+Therefore begins with warm, unstable / conditionally unstable air.
+
+As the cumulus clouds grow taller, the particles get heavier, and begin to fall since they can no longer be supported by the rising air, drawing in moisture via entrainment. 
+The cold and heavy air begins flowing downward in a downdraft, carrying with it precipitation. When the cold air in the downdraft reaches the ground, it spreads out in all directions in a gust front.
+Once the updrafts weaken and the storm no longer has a constant supply of rising, warm air, the thunderstorm begins dissipating. 
+In regions of strong vertical shear, the updraft becomes tilted in such a way that it actually rides up and over the downdraft. This forms a multicell thunderstorm. The updraft helps to create multiple thunderstorm cells that create a longer lasting, more powerful storm.
+When the convection and updrafts are so strong, they may be able to penetrate the stratosphere in an overshooting top, which will gradually subside and return to under the tropopause.
+Elevated convection occurs when the air begins to rise above the surface (so the rising is not initiated at the surface).
+Occurs due to instability aloft but not at the surface.
+Beneath a thunderstorm, localized downdrafts can produce microbursts: rapid gusts of air creating high wind shear. 
+Multicell thunderstorms often form squall lines of thunderstorms, whereas old storms die out, new ones form and thus the squall line regenerates itself. Squall lines often appear as bow echos on weather maps.
+Mesoscale convective complexes form when several independent multicell thunderstorms coalesce and organize themselves into one massive complex.
+Supercell thunderstorms form where there is such strong wind shear that a violently rotating updraft forms.
+
+Intense thunderstorms can cause flooding.
+Clouds become electrified during the growth of ice crystals, which creates charged regions in the cloud. These different charges eventually produce lightning via the flow of electrons.
+
+Tornadoes form from the rotation of downdrafts that produces a funnel cloud that eventually becomes a tornado. They are characterized by hook echos on doppler radar maps.
+Hurricanes
+
+Hurricanes form over warm tropical waters with high air humidities. Low wind shear is also important because the wind shear can disrupt the formation of the cells seen above.
+Strong winds aloft occur during El Nino years.
+Hurricanes often form from tropical troughs of low pressure that migrate across the ocean.
+Hurricanes derive their energy from the condensation of warm water molecules in deep convective clouds. 
+Hurricanes are generally steered by the wind systems that they form in (normally westerlies).
+Hurricane winds are strongest on its right side due to the fact that the movement of the storm is typically to its right.
+Warming tropical waters, as well as warmer waters in other regions of the Atlantic, will strengthen hurricanes in the near future.
+The Saharan Air Layer is a warm, dry air mass that prevents hurricane formation since it creates a stable atmosphere and it is so dry that it inhibits updraft formation.
+Climate & Climate Change
+Global Climate Influences
+The Milankovitch cycles have a major impact on climate.
+Precession: 26,000 year period. Wobble of Earth’s axis.
+Obliquity: 41,000 year period. Variations in Earth’s axial tilt.
+Eccentricity: 100,000 year period. Variations in Earth’s orbital eccentricity.
+Less obliquity and less eccentricity produce milder climates conducive to glacial periods (warmer winters = more precipitation because cold air holds more moisture than warm air, cooler summers means less melting).
+Strong thermohaline circulation is indicative of warmer climates because the warm water circulation keeps more of the Earth warm.
+Seafloor spreading rates:
+Rapid spreading leads to greater volcanic outgassing which causes temperatures to rise. Opposite occurs during times of lesser spreading.
+Aerosols: 
+Cool the surface by acting as condensation nuclei.
+Also scatter incoming sunlight back to space.
+Can explain why the Northern hemisphere has less warming than the southern hemisphere (more industrial centers = more aerosols = less warming).
+Variations in sunspots also cause variations in climate since more sunspots = more solar output which increases the temperature of the Earth.
+Pressure systems: The existence of bands of low and high pressure create wet and dry regions.
+
+Urban climates often have unique climates associated with them due to the conditions they create.
+Warm emissions from urban factories create stable atmospheres, with warm air overlying cold air. 
+It also limits the levels to which aerosols can rise due to the stability of the atmosphere.
+This often creates poor air quality in cities since the pollutants are concentrated in a smaller space.
+Furthermore, the dark surfaces covering cities often create an urban heat island which is several degrees hotter than the surrounding land due to the low albedo of the land.
+This creates a low pressure system in the city, and creates a country breeze.
+High relative humidities, stable atmospheric conditions, and little wind can create poor air qualities in cities.
+Feedback loops
+Water vapor
+More evaporation = more water vapor in the atmosphere = higher temperatures (since water vapor is a greenhouse gas) = more evaporation → positive feedback loop.
+Snow albedo
+Melting of snow = reveal land beneath it = has lower albedo = absorbs more heat = causes more warming = melts more snow → positive feedback loop.
+
+Carbonate-Silicate cycle
+CaSiO3 + H2O + 2CO2 → Ca2+ + 2HCO3 + SiO2 (1)
+The above reaction shows the weathering of wollastonite by water and CO2, producing calcium ions, bicarbonate ions, and quartz.
+The products are then carried to the ocean, where the following reaction occurs
+Ca2+ + 2HCO3 → CaCO3 + CO2 + H2O (2)
+The CaCO3 is stored in the shells of organisms, until it is released from Earth’s interior by volcanic activities. 
+During warmer periods, more precipitation occurs which leads to greater erosion of minerals in (1) and thus leads to more sequestration of CO2. As a result, the global temperatures cool and this creates a negative feedback loop.
+However, during colder periods there is less precipitation causing less weathering and leaving more CO2 in the atmosphere, leading to increased temperatures.
+Greater seafloor spreading rates amplify the erosion of silicate minerals since they subduct at a shallower angle making them more susceptible to weathering.
+This greater erosion rate causes CO2  to be sequestered from the atmosphere, decreasing global temperatures.
+Earth’s radiation budget also changes with climatic influences, as changes in albedo, cloud cover, and more all impact the absorbed and trapped insolation and can lead to periods of warming or cooling. 
+For a planet at equilibrium, the outgoing and incoming solar fluxes must be equal, so FISR = FOSR + FOLR.
+
+Climate Proxies
+Oxygen isotopes:
+O18: Heavy oxygen. Preferentially precipitates
+O16: Light oxygen. Preferentially evaporates.
+During glacial periods, more O16 is evaporated and trapped in glaciers. As a result, in glacial cores there is a lower O18/O16 ratio, but in the sea there is a higher O18/O16 ratio. 
+Tree rings:
+Wider tree rings indicate good growing conditions: plentiful rainfall, warm temperatures etc.
+Smaller rings indicate the opposite.
+Drought, glacial period, etc.
+Aragonite and Calcite Seas: 
+Aragonite and calcite are polymorphs. 
+Calcite is more stable at higher temperatures while aragonite is more stable at high pressures. 
+Ca enters the ocean through hydrothermal activity. 
+Ca is indicative of calcite, Mg is indicative of aragonite. 
+Increased hydrothermal activity = calcite sea = higher temperature.
+Lower hydrothermal activity = aragonite sea = lower temperatures.
+Aragonite seas have aragonite and high Mg-calcite, while calcite seas have low Mg-Calcite
+Mg is relevant because it is prevalent in seawater and can change the structure of calcite minerals. 
+Climate Change
+Greenhouse gas emissions are the predominant source of climate change in the modern world.
+Are a type of climate forcing.
+Aerosol emissions are countering greenhouse gas emissions, yet the forcing from greenhouse gasses outweighs the aerosol forcing.
+Increased CO2 concentrations in the atmosphere lead to ocean acidification, and the rising temperatures lead to both thermal expansion of the oceans and melting of glaciers, cumulatively leading to sea level rise.
+Deforestation also releases sequestered CO2 and causes further radiative forcing.
+The greatest amount of warming occurs at the poles, while the least amount of warming occurs at the equator.
+Increased evaporation due to higher temperatures will lead to greater global precipitation. 
+Will be concentrated over low pressure systems (equator and subpolar front).
