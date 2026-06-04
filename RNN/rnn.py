@@ -209,7 +209,7 @@ idx_to_char = {i: c for i, c in enumerate(chars)}
 # encode entire text as integers
 data = np.array([char_to_idx[c] for c in text])
 
-# one-hot encode
+# one hot
 def one_hot(idx, vocab_size):
     x = np.zeros(vocab_size)
     x[idx] = 1.0
@@ -221,8 +221,6 @@ chunk_size = 100
 
 trim = len(data) - (len(data) % rnn.batch_size)
 data = data[:trim]
-
-# reshape into B parallel streams
 streams = data.reshape(rnn.batch_size, -1)
 
 # now chunk each stream
@@ -241,7 +239,7 @@ for j in range(250): #250 epochs
         z2s = np.zeros((chunk_size, rnn.batch_size, 288))
         for t in range(chunk_size):
             x = inputs[:, t]
-            # one-hot: (batch_size, vocab_size)
+            # onehot: (batch_size, vocab_size)
             x_onehot = np.eye(vocab_size)[x]
             z1, z2, z3, prediction = rnn.forward_pass(x_onehot)
             hidden_states_l1[t + 1] = rnn.h1_state
