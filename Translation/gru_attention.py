@@ -6,6 +6,7 @@ import torch.nn.functional as F
 from collections import Counter
 from torch.utils.data import DataLoader, Dataset
 import random
+import matplotlib.pyplot as plt
 
 device = torch.device('mps' if torch.backends.mps.is_available() else 'cpu') #lets put it on gpu
 
@@ -32,7 +33,6 @@ class translator(nn.Module):
                 #start with sos token
                 prev_output = torch.full((batch_size,), 1, dtype=torch.long, device=input.device)
             else:
-                #at some point this will need to address the teacher stuff
                 prev_output =  target[:, t - 1] if random.random() < teacher_ratio else last_logits.argmax(dim = -1)
                 
             sp_embedding = self.sp_embedding(prev_output) 
@@ -61,12 +61,14 @@ class translator(nn.Module):
             #unsqueeze adds the given dimension, squeeze drops it
             prev_output = torch.full((batch_size,), 1, dtype=torch.long, device=input.device)
             outputs = [prev_output]
+            attentions = []
             while prev_output.item() != 2 and len(outputs) < 100:
                 sp_embedding = self.sp_embedding(prev_output) 
                 s = hidden[-1]                                         
                 s_expanded = s.unsqueeze(1).expand(-1, states.shape[1], -1)    
                 attention_input = torch.cat([s_expanded, states], dim=-1)        
                 attn = F.softmax(self.attention(attention_input), dim = 1) #B x T x 1, one val per hidden state
+                attentions.append(attn) #for heatmap
                 #take weighted average now to build c
                 c = (attn * states).sum(dim = 1)
                 
@@ -75,7 +77,7 @@ class translator(nn.Module):
                 logits = self.fc_out(output.squeeze(1))
                 prev_output = logits.argmax(dim=-1)
                 outputs.append(prev_output)
-            return torch.stack(outputs, dim=1)
+            return torch.stack(outputs, dim=1), attentions
 
 class TranslationPairs(Dataset):
     def __init__(self, pairs, eng_word2idx, spa_word2idx):
@@ -158,16 +160,18 @@ if __name__ == "__main__":
             loss.backward()
             torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
             optimizer.step()
-            scheduler.step()
             if counter == 100:
                 print("Loss: ", loss.item())
                 counter = 0
             counter += 1
+
+        scheduler.step()
         model.eval()
         sample_pairs = pairs[::len(pairs)//10][:10]
         for eng, _ in sample_pairs:
             encoded = torch.tensor([encode(eng, eng_word2idx)], dtype=torch.long)
-            output = model.sample(encoded)[0].tolist()
+            output_tensor, attns = model.sample(encoded)
+            output = output_tensor[0].tolist()
             words = [spa_idx2word.get(i, "<UNK>") for i in output if i not in (0, 1, 2)]
             print(f"{eng} -> {' '.join(words)}")
 
@@ -176,13 +180,42 @@ if __name__ == "__main__":
         model.eval()
         for eng, _ in sample_pairs:
             encoded = torch.tensor([encode(eng, eng_word2idx)], dtype=torch.long)
-            output = model.sample(encoded)[0].tolist()
+            output_tensor, attns = model.sample(encoded)
+            output = output_tensor[0].tolist()
             words = [spa_idx2word.get(i, "<UNK>") for i in output if i not in (0, 1, 2)]
             f.write(f"{eng} -> {' '.join(words)}\n")
 
         sample_pairs2 = pairs[-100:]
         for eng, _ in sample_pairs2:
             encoded = torch.tensor([encode(eng, eng_word2idx)], dtype=torch.long)
-            output = model.sample(encoded)[0].tolist()
+            output_tensor, attns = model.sample(encoded)
+            output = output_tensor[0].tolist()
             words = [spa_idx2word.get(i, "<UNK>") for i in output if i not in (0, 1, 2)]
             f.write(f"{eng} -> {' '.join(words)}\n")
+
+    #for plotting
+    def plot_attention(input_sentence, output_sentence, attentions, filename):
+        attn_matrix = torch.cat([a.squeeze(-1) for a in attentions], dim=0).cpu().numpy()
+        attn_matrix = attn_matrix[:, :len(input_sentence)] #truncate
+        
+        fig, ax = plt.subplots(figsize=(len(input_sentence), len(output_sentence) * 0.6))
+        im = ax.imshow(attn_matrix, cmap='Blues', aspect='auto', vmin=0, vmax=attn_matrix.max())
+        
+        ax.set_xticks(range(len(input_sentence)))
+        ax.set_yticks(range(len(output_sentence)))
+        ax.set_xticklabels(input_sentence, rotation=45, ha='left', fontsize=10)
+        ax.set_yticklabels(output_sentence, fontsize=10)
+        ax.xaxis.set_label_position('top')
+        
+        plt.colorbar(im, ax=ax, fraction=0.046)
+        plt.tight_layout()
+        plt.savefig(filename, dpi=150, bbox_inches='tight')
+        plt.close()
+
+    sample_pairs3 = pairs[::len(pairs)//10][:10]
+    for (idx, (eng, _)) in enumerate(sample_pairs3):
+        encoded = torch.tensor([encode(eng, eng_word2idx)], dtype=torch.long)
+        output_tensor, attns = model.sample(encoded)
+        output = output_tensor[0].tolist()
+        words = [spa_idx2word.get(i, "<UNK>") for i in output if i not in (0, 1, 2)]
+        plot_attention(eng.lower().split(), words, attns, f"translation/attn_{idx}.png")
