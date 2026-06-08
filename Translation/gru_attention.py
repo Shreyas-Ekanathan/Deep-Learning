@@ -142,6 +142,7 @@ model = translator(512, 256, eng_vocab_size, sp_vocab_size).to(device)
 optimizer = torch.optim.Adam(model.parameters(), lr=0.001, weight_decay=1e-4)
 loss_fn = nn.CrossEntropyLoss(ignore_index=0)
 num_epochs = 50
+scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=num_epochs, eta_min=1e-5)
 
 if __name__ == "__main__":
     for epoch in range(num_epochs):
@@ -157,6 +158,7 @@ if __name__ == "__main__":
             loss.backward()
             torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
             optimizer.step()
+            scheduler.step()
             if counter == 100:
                 print("Loss: ", loss.item())
                 counter = 0
