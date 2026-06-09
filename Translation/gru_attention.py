@@ -143,28 +143,33 @@ loader = DataLoader(dataset, batch_size=64, collate_fn=collate_fn, shuffle=True,
 model = translator(512, 256, eng_vocab_size, sp_vocab_size).to(device)
 optimizer = torch.optim.Adam(model.parameters(), lr=0.001, weight_decay=1e-4)
 loss_fn = nn.CrossEntropyLoss(ignore_index=0)
-num_epochs = 50
+num_epochs = 150
 scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=num_epochs, eta_min=1e-5)
 
 if __name__ == "__main__":
+    best_loss = float('inf')
     for epoch in range(num_epochs):
         model.train()
         print("Epoch:", epoch)
-        counter = 0
+        avg_loss = 0
         for english, spanish in loader:
             english, spanish = english.to(device), spanish.to(device)
             optimizer.zero_grad()
-            teacher_forcing_ratio = max(0.2, 1.0 - epoch * 0.025)  
+            teacher_forcing_ratio = max(0.6, 1.0 - epoch * 0.01)  
             logits = model(english, spanish, spanish.shape[1], teacher_forcing_ratio).permute(0, 2, 1)
             loss = loss_fn(logits, spanish)
             loss.backward()
+            avg_loss += loss.item()
             torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
             optimizer.step()
-            if counter == 100:
-                print("Loss: ", loss.item())
-                counter = 0
-            counter += 1
-
+        
+        avg_loss /= len(loader)
+        print(f"Avg loss: {avg_loss:.4f}")
+        if avg_loss < best_loss:
+            best_loss = avg_loss
+            torch.save(model.state_dict(), 'translation/best_model.pt')
+            print("Checkpoint saved")
+            
         scheduler.step()
         model.eval()
         sample_pairs = pairs[::len(pairs)//10][:10]
@@ -196,11 +201,11 @@ if __name__ == "__main__":
     #for plotting
     def plot_attention(input_sentence, output_sentence, attentions, filename):
         attn_matrix = torch.cat([a.squeeze(-1) for a in attentions], dim=0).cpu().numpy()
-        attn_matrix = attn_matrix[:, :len(input_sentence)] #truncate
-        
+        attn_matrix = attn_matrix[:len(output_sentence), :len(input_sentence)]
+        attn_matrix = attn_matrix / (attn_matrix.sum(axis=1, keepdims=True) + 1e-9)
+
         fig, ax = plt.subplots(figsize=(len(input_sentence), len(output_sentence) * 0.6))
-        im = ax.imshow(attn_matrix, cmap='Blues', aspect='auto', vmin=0, vmax=attn_matrix.max())
-        
+        im = ax.imshow(attn_matrix, cmap='Blues', aspect='auto', vmin=0, vmax=1)
         ax.set_xticks(range(len(input_sentence)))
         ax.set_yticks(range(len(output_sentence)))
         ax.set_xticklabels(input_sentence, rotation=45, ha='left', fontsize=10)
