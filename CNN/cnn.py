@@ -191,7 +191,7 @@ class model:
         self.k1_m = self.k1_m * beta + (1 - beta) * kernel1_bar
         self.k_b1_m = self.k_b1_m * beta + (1 - beta) * kernel_b1_bar
         self.k2_m = self.k2_m * beta + (1 - beta) * kernel2_bar
-        self.k2_b1_m = self.k_b2_m * beta + (1 - beta) * kernel_b2_bar
+        self.k_b2_m = self.k_b2_m * beta + (1 - beta) * kernel_b2_bar
         self.fc1_m = self.fc1_m * beta + (1 - beta) * fc1_bar
         self.fc_b1_m = self.fc_b1_m * beta + (1 - beta) * fc_b1_bar
         self.fc2_m = self.fc2_m * beta + (1 - beta) * fc2_bar
