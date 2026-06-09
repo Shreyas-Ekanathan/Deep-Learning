@@ -180,7 +180,7 @@ if __name__ == "__main__":
             words = [spa_idx2word.get(i, "<UNK>") for i in output if i not in (0, 1, 2)]
             print(f"{eng} -> {' '.join(words)}")
 
-    with open("translation/results.txt", "w") as f:
+    with open("translation/gru_results/results.txt", "w") as f:
         sample_pairs = pairs[::len(pairs)//250][:250]
         model.eval()
         for eng, _ in sample_pairs:
@@ -223,4 +223,4 @@ if __name__ == "__main__":
         output_tensor, attns = model.sample(encoded)
         output = output_tensor[0].tolist()
         words = [spa_idx2word.get(i, "<UNK>") for i in output if i not in (0, 1, 2)]
-        plot_attention(eng.lower().split(), words, attns, f"translation/attn_{idx}.png")
+        plot_attention(eng.lower().split(), words, attns, f"translation/gru_results/attn_{idx}.png")
