@@ -10,6 +10,10 @@ import matplotlib.pyplot as plt
 
 device = torch.device('mps' if torch.backends.mps.is_available() else 'cpu') #lets put it on gpu
 
+#implement Bengio's translator architecture from jointly learning to align and translate
+#encoder and decoders as GRU layers, cross attention as a linear layer
+#trained on tatoeba english to spanish, performance in gru_results
+
 class translator(nn.Module):
     def __init__(self, H, E, eng_vocab_size, sp_vocab_size):
         super().__init__()
