@@ -1,3 +1,5 @@
 CNN/MNIST/
 *.pt
 *.txt
+VAE/cifar-10-batches-py
+VAE/cifar-10-python.tar.gz
