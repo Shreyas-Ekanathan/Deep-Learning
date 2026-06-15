@@ -1,6 +1,7 @@
 #let's make a VAE for CIFAR
 # visualize the latent space and test out interpolations, see what interesting stuff happens
 #convolutional encoder and decoder
+#add class data to the encodings and decodings 
 
 import numpy as np
 import torch
