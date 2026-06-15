@@ -184,3 +184,15 @@ for c in range(10):
 plt.legend(markerscale=5)
 plt.savefig('VAE/data_analysis/tsne.png', dpi=150, bbox_inches='tight')
 plt.close()
+
+classes = ['plane','car','bird','cat','deer','dog','frog','horse','ship','truck']
+fig, axes = plt.subplots(1, 10, figsize=(20, 2))
+with torch.no_grad():
+    z = torch.randn(10, latent_dim).to(device)
+    samples = model._orig_mod.decode(z).cpu()
+for i in range(10):
+    axes[i].imshow(samples[i].permute(1, 2, 0).clip(0, 1))
+    axes[i].axis('off')
+    axes[i].set_title(classes[i], fontsize=8)
+plt.savefig('VAE/data_analysis/samples.png', dpi=150, bbox_inches='tight')
+plt.close()

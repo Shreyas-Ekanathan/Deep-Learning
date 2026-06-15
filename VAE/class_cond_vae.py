@@ -25,25 +25,28 @@ device = torch.device('mps' if torch.backends.mps.is_available() else 'cpu') #le
 class VAE(nn.Module):
     def __init__(self, latent_dim):
         super().__init__()
+        self.class_embeddings = nn.Embedding(10, 32)
         self.conv1 = nn.Conv2d(3, 32, 3, stride=2, padding=1)
         self.conv2 = nn.Conv2d(32, 64, 3, stride=2, padding=1)
         self.conv3 = nn.Conv2d(64, 128, 3, stride=2, padding=1)
         #output after this should be like 4x4x128, which becomes 2048x1
         # we flatten this to get our linear layer to give us mu and sigma
-        self.mu = nn.Linear(2048, latent_dim)
-        self.log_sigma = nn.Linear(2048, latent_dim)
+        self.mu = nn.Linear(2048 + 32, latent_dim)
+        self.log_sigma = nn.Linear(2048 + 32, latent_dim)
         
         #now decode
-        self.decoder_linear = nn.Linear(latent_dim, 2048)
+        self.decoder_linear = nn.Linear(latent_dim + 32, 2048) #add embedding info
         self.upconv1 = nn.ConvTranspose2d(128, 64, 3, stride = 2, padding = 1, output_padding = 1)
         self.upconv2 = nn.ConvTranspose2d(64, 32, 3, stride = 2, padding = 1, output_padding = 1)
         self.upconv3 = nn.ConvTranspose2d(32, 3, 3, stride = 2, padding = 1, output_padding = 1)
         
-    def forward(self, x):
+    def forward(self, x, target):
         x = F.relu(self.conv1(x))
         x = F.relu(self.conv2(x))
         x = F.relu(self.conv3(x))
         x = x.reshape(-1, 2048)
+        embedding = self.class_embeddings(target)
+        x = torch.cat([x, embedding], dim=1)
         mu = self.mu(x)
         log_sigma = self.log_sigma(x)
         sigma = torch.exp(0.5 * log_sigma)
@@ -51,6 +54,7 @@ class VAE(nn.Module):
         #now we sample to give something to the decoder
         epsilon = torch.randn_like(sigma)
         decoder_input = mu + sigma * epsilon
+        decoder_input = torch.cat([decoder_input, embedding], dim = 1)
         decoder_input = F.relu(self.decoder_linear(decoder_input))
         decoder_input = decoder_input.reshape(-1, 128, 4, 4)
         out = self.upconv1(decoder_input)
@@ -65,7 +69,9 @@ class VAE(nn.Module):
         loss = mse + beta * kl
         return loss
     
-    def decode(self, decoder_input):
+    def decode(self, decoder_input, target):
+        embedding = self.class_embeddings(target)
+        decoder_input = torch.cat([decoder_input, embedding], dim = 1)
         decoder_input = F.relu(self.decoder_linear(decoder_input))
         decoder_input = decoder_input.reshape(-1, 128, 4, 4)
         out = self.upconv1(decoder_input)
@@ -74,11 +80,13 @@ class VAE(nn.Module):
         out = torch.sigmoid(out)
         return out
     
-    def encode(self, x):
+    def encode(self, x, target):
+        embedding = self.class_embeddings(target)
         x = F.relu(self.conv1(x))
         x = F.relu(self.conv2(x))
         x = F.relu(self.conv3(x))
         x = x.reshape(-1, 2048)
+        x = torch.cat([x, embedding], dim=1)
         mu = self.mu(x)
         log_sigma = self.log_sigma(x)
         sigma = torch.exp(0.5 * log_sigma)
@@ -107,8 +115,9 @@ for epoch in range(num_epochs):
     avg_loss = 0
     for x, target in train_loader:
         x = x.to(device)
+        target = target.to(device)
         optimizer.zero_grad()
-        out, mu, log_sigma  = model(x)
+        out, mu, log_sigma  = model(x, target)
         loss = model.ELBO(out, x, mu, log_sigma, beta = min(0.3, epoch / (num_epochs * 0.5)))
         loss.backward()
         optimizer.step()
@@ -122,9 +131,10 @@ model.eval()
 fig, axes = plt.subplots(2, 10, figsize=(20, 4))
 
 with torch.no_grad():
-    images, _ = next(iter(train_loader))
+    images, target = next(iter(train_loader))
     images = images[:10].to(device)
-    reconstructions = model(images)[0].cpu()
+    target = target[:10].to(device)
+    reconstructions = model(images, target)[0].cpu()
 
 for i in range(10):
     axes[0, i].imshow(images[i].cpu().permute(1, 2, 0))
@@ -135,29 +145,30 @@ for i in range(10):
 axes[0, 0].set_ylabel('Original')
 axes[1, 0].set_ylabel('Reconstructed')
 plt.tight_layout()
-plt.savefig('VAE/data_analysis/reconstructions2.png', dpi=150, bbox_inches='tight')
-#reconstructions is with 2 conv layers, latent dim 128, 
-# reconstructions2 is with 3, latent dim 256
+plt.savefig('VAE/class_data_analysis/reconstructions.png', dpi=150, bbox_inches='tight')
 plt.close()
 
+#interpolation plots
 for n in range(3):
-    images, _ = next(iter(train_loader))
+    images, target = next(iter(train_loader))
     img1 = images[0:1].to(device)
     img2 = images[1:2].to(device)
+    target1 = target[0:1].to(device)
+    target2 = target[1:2].to(device)
 
     with torch.no_grad():
-        _, mu1 = model._orig_mod.encode(img1)
-        _, mu2 = model._orig_mod.encode(img2)
+        _, mu1 = model._orig_mod.encode(img1, target1)
+        _, mu2 = model._orig_mod.encode(img2, target2)
 
         steps = 10
         fig, axes = plt.subplots(1, steps, figsize=(20, 2))
         for i, t in enumerate(torch.linspace(0, 1, steps)):
             z = (1 - t) * mu1 + t * mu2
-            out = model._orig_mod.decode(z).cpu()
+            out = model._orig_mod.decode(z, target1 if t < 0.5 else target2).cpu()
             axes[i].imshow(out[0].permute(1, 2, 0).clip(0, 1))
             axes[i].axis('off')
 
-    plt.savefig(f'VAE/data_analysis/interpolation{n}.png', dpi=150, bbox_inches='tight')
+    plt.savefig(f'VAE/class_data_analysis/interpolation{n}.png', dpi=150, bbox_inches='tight')
     plt.close()
 
 
@@ -166,9 +177,10 @@ all_labels = []
 with torch.no_grad():
     for x, labels in train_loader:
         x = x.to(device)
-        _, mu = model._orig_mod.encode(x)
+        labels = labels.to(device)
+        _, mu = model._orig_mod.encode(x, labels)
         all_mu.append(mu.cpu().numpy())
-        all_labels.append(labels.numpy())
+        all_labels.append(labels.cpu().numpy())
 
 all_mu = np.concatenate(all_mu)
 all_labels = np.concatenate(all_labels)
@@ -183,5 +195,18 @@ for c in range(10):
     mask = all_labels[idx] == c
     plt.scatter(embedded[mask, 0], embedded[mask, 1], s=2, label=classes[c], alpha=0.5)
 plt.legend(markerscale=5)
-plt.savefig('VAE/data_analysis/tsne.png', dpi=150, bbox_inches='tight')
+plt.savefig('VAE/class_data_analysis/tsne.png', dpi=150, bbox_inches='tight')
+plt.close()
+
+classes = ['plane','car','bird','cat','deer','dog','frog','horse','ship','truck']
+fig, axes = plt.subplots(1, 10, figsize=(20, 2))
+with torch.no_grad():
+    z = torch.randn(10, latent_dim).to(device)
+    labels = torch.arange(10).to(device)
+    samples = model._orig_mod.decode(z, labels).cpu()
+for i in range(10):
+    axes[i].imshow(samples[i].permute(1, 2, 0).clip(0, 1))
+    axes[i].axis('off')
+    axes[i].set_title(classes[i], fontsize=8)
+plt.savefig('VAE/class_data_analysis/samples.png', dpi=150, bbox_inches='tight')
 plt.close()
