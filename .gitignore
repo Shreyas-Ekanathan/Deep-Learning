@@ -3,3 +3,5 @@ CNN/MNIST/
 *.txt
 VAE/cifar-10-batches-py
 VAE/cifar-10-python.tar.gz
+MRI2CT/data/validation_raw
+*.DS_Store
