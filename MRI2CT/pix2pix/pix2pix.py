@@ -12,6 +12,9 @@ import sys, os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 from data.dataset import MRI_CT_DATASET
 
+#implementation based on https://arxiv.org/pdf/1611.07004
+#with modernizing improvements
+
 class EncoderBlock(nn.Module):
     def __init__(self, in_channels, out_channels):
         super().__init__()
