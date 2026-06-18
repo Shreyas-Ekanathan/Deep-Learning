@@ -8,6 +8,8 @@ import random
 import matplotlib.pyplot as plt
 from kornia.losses import ssim_loss
 import wandb
+import sys, os
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 from data.dataset import MRI_CT_DATASET
 
 class EncoderBlock(nn.Module):
@@ -81,17 +83,17 @@ if __name__ == "__main__":
     print(device)
     U_net = u_net().to(device)
     U_net = torch.compile(U_net)
-    optimizer = torch.optim.Adam(U_net.parameters(), lr=0.001, weight_decay=1e-4)
-    num_epochs = 50
+    optimizer = torch.optim.Adam(U_net.parameters(), lr=2e-4, weight_decay=1e-4)
+    num_epochs = 20
     scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=num_epochs, eta_min=1e-5)
 
-    train_dataset = MRI_CT_DATASET("MRI2CT/data/train/mri", "MRI2CT/data/train/ct")
-    test_dataset = MRI_CT_DATASET("MRI2CT/data/test/mri", "MRI2CT/data/test/ct")
+    train_dataset = MRI_CT_DATASET("data/train/mri", "data/train/ct")
+    test_dataset = MRI_CT_DATASET("data/test/mri", "data/test/ct")
     train_loader = DataLoader(train_dataset, batch_size = 8, shuffle = True, num_workers = 4, persistent_workers = True)
     test_loader = DataLoader(test_dataset, batch_size = 8, shuffle = False, num_workers = 4, persistent_workers = True)
 
     wandb.init(project="mri2ct", name="baseline-u-net", config={
-        "lr": 0.001,
+        "lr": 2e-4,
         "batch_size": 8,
         "epochs": num_epochs,
         "architecture": "unet"
@@ -101,6 +103,7 @@ if __name__ == "__main__":
         U_net.train()
         avg_loss = 0
         Lambda = min(0.5, epoch / num_epochs * 0.5)
+        count = 0
         for x, real_ct in train_loader:
             x = x.to(device)
             real_ct = real_ct.to(device)
@@ -112,6 +115,9 @@ if __name__ == "__main__":
             loss.backward()
             optimizer.step()
             avg_loss += loss.item()
+            count += 1
+            if (count > 0 and count % 100 == 0):
+                print("Loss: ", avg_loss / count)
 
         U_net.eval()
         val_loss = 0
@@ -134,15 +140,14 @@ if __name__ == "__main__":
             "lambda_ssim": Lambda,
         })
                 
-        if epoch % 10 == 0:
-            sample_mri, sample_ct = next(iter(test_loader))
-            with torch.no_grad():
-                predicted_ct = U_net(sample_mri.to(device))
-            wandb.log({
-                "mri_input": wandb.Image(sample_mri[0]),
-                "ct_predicted": wandb.Image(predicted_ct[0]),
-                "ct_real": wandb.Image(sample_ct[0]),
-            })
-            torch.save(U_net.state_dict(), f"unet_epoch_{epoch}.pth")
+        sample_mri, sample_ct = next(iter(test_loader))
+        with torch.no_grad():
+            predicted_ct = U_net(sample_mri.to(device))
+        wandb.log({
+            "mri_input": wandb.Image((sample_mri[0] + 1) / 2),
+            "ct_predicted": wandb.Image((predicted_ct[0].cpu() + 1) / 2),
+            "ct_real": wandb.Image((sample_ct[0] + 1) / 2),
+        })
+        torch.save(U_net.state_dict(), f"unet_epoch_{epoch}.pth")
 
         scheduler.step()

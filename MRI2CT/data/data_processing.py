@@ -37,6 +37,6 @@ patients  = sorted([p for p in data_root.iterdir() if p.is_dir() and p.name != "
 
 split_idx = int(0.8 * len(patients))
 for p in patients[:split_idx]:
-    preprocess_patient(p, "data", split="train")
+    preprocess_patient(p, "MRI2CT/data", split="train")
 for p in patients[split_idx:]:
-    preprocess_patient(p, "data", split="test")
+    preprocess_patient(p, "MRI2CT/data", split="test")
