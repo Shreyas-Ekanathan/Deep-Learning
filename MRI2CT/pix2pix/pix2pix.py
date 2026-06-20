@@ -104,7 +104,6 @@ if __name__ == "__main__":
     U_net = u_net().to(device)
     U_net = torch.compile(U_net)
     discrim = discriminator().to(device)
-    discrim = torch.compile(discrim)
     discrim_optimizer = torch.optim.Adam(discrim.parameters(), lr=2e-4, weight_decay=1e-4)
     gen_optimizer = torch.optim.Adam(U_net.parameters(), lr=2e-4, weight_decay=1e-4)
     num_epochs = 20
@@ -116,7 +115,7 @@ if __name__ == "__main__":
     train_loader = DataLoader(train_dataset, batch_size = 8, shuffle = True, num_workers = 4, persistent_workers = True)
     test_loader = DataLoader(test_dataset, batch_size = 8, shuffle = False, num_workers = 4, persistent_workers = True)
 
-    wandb.init(project="mri2ct", name="pix2pix-wgan-gp", config={
+    wandb.init(project="mri2ct", name="pix2pix-wgan-gp", dir=os.path.dirname(__file__), config={
         "lr": 2e-4,
         "batch_size": 8,
         "epochs": num_epochs,
@@ -140,7 +139,7 @@ if __name__ == "__main__":
             fake_score = discrim(x, predicted_ct)
             #discrim backprop
             wasserstein = fake_score.mean() - real_score.mean()
-            epsilon = torch.rand(8, 1, 1, 1).to(device) #get a random intermediate point for gradients
+            epsilon = torch.rand(x.shape[0], 1, 1, 1).to(device) #get a random intermediate point for gradients
             interpolated = (epsilon * real_ct + (1 - epsilon) * predicted_ct).requires_grad_(True)
             interp_score = discrim(x, interpolated)
             gradients = torch.autograd.grad(
