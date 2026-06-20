@@ -4,4 +4,12 @@ CNN/MNIST/
 VAE/cifar-10-batches-py
 VAE/cifar-10-python.tar.gz
 MRI2CT/data/validation_raw
+MRI2CT/data/train_raw
+MRI2CT/data/train
+MRI2CT/data/test
+MRI2CT/U-NET/wandb
+MRI2CT/pix2pix/wandb
+MRI2CT/cycleGAN/wandb
+MRI2CT/data/__pycache__
 *.DS_Store
+*.pth
