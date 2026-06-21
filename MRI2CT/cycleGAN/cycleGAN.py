@@ -116,11 +116,11 @@ if __name__ == "__main__":
     test_dataset = MRI_CT_DATASET("data/test/mri", "data/test/ct")
     test_loader = DataLoader(test_dataset, batch_size = 8, shuffle = False, num_workers = 4, persistent_workers = True)
 
-    wandb.init(project="mri2ct", name="pix2pix-wgan-gp", dir=os.path.dirname(__file__), config={
+    wandb.init(project="mri2ct", name="cyclegan-wgan-gp", dir=os.path.dirname(__file__), config={
         "lr": 2e-4,
         "batch_size": 8,
         "epochs": num_epochs,
-        "architecture": "pix2pix"
+        "architecture": "cyclegan"
     })
 
     for epoch in range(num_epochs):
