@@ -10,6 +10,8 @@ MRI2CT/data/test
 MRI2CT/U-NET/wandb
 MRI2CT/pix2pix/wandb
 MRI2CT/cycleGAN/wandb
+MRI2CT/Trans-U-NET/wandb
+MRI2CT/latent-spaces/wandb
 MRI2CT/data/__pycache__
 *.DS_Store
 *.pth
