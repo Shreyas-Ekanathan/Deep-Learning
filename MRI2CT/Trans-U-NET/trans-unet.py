@@ -114,7 +114,6 @@ device = torch.device('mps' if torch.backends.mps.is_available() else 'cpu') #le
 if __name__ == "__main__":
     print(device)
     trans_U_net = trans_UNET().to(device)
-    trans_U_net = torch.compile(trans_U_net)
     optimizer = torch.optim.Adam(trans_U_net.parameters(), lr=2e-4, weight_decay=1e-4)
     num_epochs = 20
     scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=num_epochs, eta_min=1e-5)
