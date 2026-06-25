@@ -104,7 +104,7 @@ class u_net(nn.Module):
             return torch.cos((t / T + s) / (1 + s) * math.pi / 2) ** 2
         
         numerator = f(t)
-        denom = f(0)
+        denom = f(torch.tensor(0.0, device=t.device))
         return numerator / denom
     
     
@@ -126,19 +126,48 @@ def ddpm_sample(model, mri, alpha_bars, T=1000):
 def ddim_sample(model, mri, alpha_bars, T = 1000, num_steps = 50):
     x = torch.randn_like(mri)  # start from pure noise
     tsteps = torch.linspace(T-1, 0, num_steps).long()
-    for t in tsteps:
+    for i, t in enumerate(tsteps):
         t_batch = torch.full((mri.shape[0],), t, device=mri.device) #stretch t out
         predicted_noise = model(x, t_batch, mri)
-        
+
         alpha_bar_t = alpha_bars[t]
-        alpha_bar_prev = alpha_bars[t - 1] if t > 0 else torch.tensor(1.0).to(mri.device)
-        
+        if i + 1 < len(tsteps):
+            alpha_bar_prev = alpha_bars[tsteps[i + 1]]
+        else:
+            alpha_bar_prev = torch.tensor(1.0, device=mri.device)
+
         # DDIM reverse step
         x = (x - (1 - alpha_bar_t).sqrt() * predicted_noise) / alpha_bar_t.sqrt()
         x = alpha_bar_prev.sqrt() * x + (1 - alpha_bar_prev).sqrt() * predicted_noise
-    
+
     return x
 
+def DPM_sample(model, mri, alpha_bars, T = 1000, num_steps = 50):
+    #second order solver, more expensive but should be better
+    
+    x = torch.randn_like(mri)  # start from pure noise
+    tsteps = torch.linspace(T-1, 0, num_steps).long()
+    l = torch.log(torch.sqrt(alpha_bars / (1 - alpha_bars)))
+    for i, t in enumerate(tsteps):
+        t_batch = torch.full((mri.shape[0],), t, device=mri.device) #stretch t out
+        epsilon1 = model(x, t_batch, mri)
+        
+        alpha_bar_t = alpha_bars[t]
+        if i + 1 < len(tsteps):
+            alpha_bar_prev = alpha_bars[tsteps[i + 1]]
+            t_next = tsteps[i + 1]
+        else:
+            alpha_bar_prev = torch.tensor(1.0, device=mri.device)
+            t_next = 0
+
+        h = l[t_next] - l[t]
+        x_guess = alpha_bar_prev.sqrt() / alpha_bar_t.sqrt() * x - (1 - alpha_bar_prev).sqrt() * ((torch.e ** h) - 1) * epsilon1
+        
+        t_next_batch = torch.full((mri.shape[0],), t_next, device=mri.device) #stretch t out
+        epsilon2 = model(x_guess, t_next_batch, mri)
+        #trapezoidal update
+        x = alpha_bar_prev.sqrt() / alpha_bar_t.sqrt() * x -  (1 - alpha_bar_prev).sqrt() * ((torch.e ** h) - 1) * (epsilon1 + epsilon2) / 2 
+    return x
 
 device = torch.device('mps' if torch.backends.mps.is_available() else 'cpu') #lets put it on gpu
 
@@ -165,7 +194,7 @@ if __name__ == "__main__":
     
     T = 1000
     ts = torch.arange(T).to(device)
-    alpha_bars = U_net.cosine_scheduler(ts)  
+    alpha_bars = U_net._orig_mod.cosine_scheduler(ts)
 
     for epoch in range(num_epochs):
         U_net.train()
@@ -195,7 +224,7 @@ if __name__ == "__main__":
         U_net.eval()
         sample_mri, sample_ct = next(iter(test_loader))
         with torch.no_grad():
-            predicted_ct = ddpm_sample(U_net, sample_mri.to(device), alpha_bars) #just one batch
+            predicted_ct = ddim_sample(U_net, sample_mri.to(device), alpha_bars) #just one batch
         val_l1 = F.l1_loss(predicted_ct, sample_ct.to(device)).item()
         val_ssim = ssim_loss(predicted_ct, sample_ct.to(device), window_size=11).item()
 
