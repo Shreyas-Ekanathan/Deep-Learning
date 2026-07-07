@@ -137,8 +137,9 @@ def ddim_sample(model, mri, alpha_bars, T = 1000, num_steps = 50):
             alpha_bar_prev = torch.tensor(1.0, device=mri.device)
 
         # DDIM reverse step
-        x = (x - (1 - alpha_bar_t).sqrt() * predicted_noise) / alpha_bar_t.sqrt()
-        x = alpha_bar_prev.sqrt() * x + (1 - alpha_bar_prev).sqrt() * predicted_noise
+        x_0_pred = (x - (1 - alpha_bar_t).sqrt() * predicted_noise) / alpha_bar_t.sqrt()
+        x_0_pred = x_0_pred.clamp(-1, 1)
+        x = alpha_bar_prev.sqrt() * x_0_pred + (1 - alpha_bar_prev).sqrt() * predicted_noise
 
     return x
 
@@ -147,7 +148,7 @@ def DPM_sample(model, mri, alpha_bars, T = 1000, num_steps = 50):
     
     x = torch.randn_like(mri)  # start from pure noise
     tsteps = torch.linspace(T-1, 0, num_steps).long()
-    l = torch.log(torch.sqrt(alpha_bars / (1 - alpha_bars)))
+    l = torch.log(torch.sqrt(alpha_bars.clamp(0, 1 - 1e-6) / (1 - alpha_bars).clamp(1e-6, 1)))
     for i, t in enumerate(tsteps):
         t_batch = torch.full((mri.shape[0],), t, device=mri.device) #stretch t out
         epsilon1 = model(x, t_batch, mri)
@@ -176,7 +177,7 @@ if __name__ == "__main__":
     U_net = u_net().to(device)
     U_net = torch.compile(U_net)
     optimizer = torch.optim.Adam(U_net.parameters(), lr=2e-4, weight_decay=1e-4)
-    num_epochs = 20
+    num_epochs = 200
     scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=num_epochs, eta_min=1e-5)
 
     data_root = os.path.join(os.path.dirname(__file__), "..", "data")
@@ -237,5 +238,6 @@ if __name__ == "__main__":
             "images/ct_predicted": wandb.Image((predicted_ct[0].cpu() + 1) / 2),
             "images/ct_real": wandb.Image((sample_ct[0] + 1) / 2),
         })
-        torch.save(U_net.state_dict(), os.path.join(os.path.dirname(__file__), f"diffusion_epoch_{epoch}.pth"))
+        if (epoch % 20 == 0):
+            torch.save(U_net.state_dict(), os.path.join(os.path.dirname(__file__), f"diffusion_epoch_{epoch}.pth"))
         scheduler.step()

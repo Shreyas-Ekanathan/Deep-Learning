@@ -119,15 +119,65 @@ def ddpm_sample(model, mri, alpha_bars, T=1000):
         alpha_bar_prev = alpha_bars[t - 1] if t > 0 else torch.tensor(1.0).to(mri.device)
         
         # DDPM reverse step
-        x = (x - (1 - alpha_bar_t).sqrt() * predicted_noise) / alpha_bar_t.sqrt()
-        x = alpha_bar_prev.sqrt() * x + (1 - alpha_bar_prev).sqrt() * torch.randn_like(x)
+        x_0_pred = (x - (1 - alpha_bar_t).sqrt() * predicted_noise) / alpha_bar_t.sqrt()
+        x_0_pred = x_0_pred.clamp(-1, 1)
+        x = alpha_bar_prev.sqrt() * x_0_pred + (1 - alpha_bar_prev).sqrt() * torch.randn_like(x)
     
+    return x
+
+def ddim_sample(model, mri, alpha_bars, T = 1000, num_steps = 50):
+    x = torch.randn_like(mri)  # start from pure noise
+    tsteps = torch.linspace(T-1, 0, num_steps).long()
+    for i, t in enumerate(tsteps):
+        t_batch = torch.full((mri.shape[0],), t, device=mri.device) #stretch t out
+        predicted_noise = model(x, t_batch, mri)
+
+        alpha_bar_t = alpha_bars[t]
+        if i + 1 < len(tsteps):
+            alpha_bar_prev = alpha_bars[tsteps[i + 1]]
+        else:
+            alpha_bar_prev = torch.tensor(1.0, device=mri.device)
+
+        # DDIM reverse step
+        x_0_pred = (x - (1 - alpha_bar_t).sqrt() * predicted_noise) / alpha_bar_t.sqrt()
+        x_0_pred = x_0_pred.clamp(-1, 1)
+        x = alpha_bar_prev.sqrt() * x_0_pred + (1 - alpha_bar_prev).sqrt() * predicted_noise
+
+    return x
+
+def DPM_sample(model, mri, alpha_bars, T = 1000, num_steps = 50):
+    #second order solver, more expensive but should be better
+    
+    x = torch.randn_like(mri)  # start from pure noise
+    tsteps = torch.linspace(T-1, 0, num_steps).long()
+    l = torch.log(torch.sqrt(alpha_bars.clamp(0, 1 - 1e-6) / (1 - alpha_bars).clamp(1e-6, 1)))
+    for i, t in enumerate(tsteps):
+        t_batch = torch.full((mri.shape[0],), t, device=mri.device) #stretch t out
+        epsilon1 = model(x, t_batch, mri)
+        
+        alpha_bar_t = alpha_bars[t]
+        if i + 1 < len(tsteps):
+            alpha_bar_prev = alpha_bars[tsteps[i + 1]]
+            t_next = tsteps[i + 1]
+        else:
+            alpha_bar_prev = torch.tensor(1.0, device=mri.device)
+            t_next = 0
+
+        h = l[t_next] - l[t]
+        x_guess = alpha_bar_prev.sqrt() / alpha_bar_t.sqrt() * x - (1 - alpha_bar_prev).sqrt() * ((torch.e ** h) - 1) * epsilon1
+        x_guess = x_guess.clamp(-1, 1)
+
+        t_next_batch = torch.full((mri.shape[0],), t_next, device=mri.device) #stretch t out
+        epsilon2 = model(x_guess, t_next_batch, mri)
+        #trapezoidal update
+        x = alpha_bar_prev.sqrt() / alpha_bar_t.sqrt() * x - (1 - alpha_bar_prev).sqrt() * ((torch.e ** h) - 1) * (epsilon1 + epsilon2) / 2
+        x = x.clamp(-1, 1)
     return x
 
 device = torch.device('mps' if torch.backends.mps.is_available() else 'cpu') #lets put it on gpu
 
 U_net = u_net().to(device)
-state_dict = torch.load("diffusion/diffusion_epoch_19.pth", map_location=device)
+state_dict = torch.load("diffusion/diffusion_epoch_140.pth", map_location=device)
 state_dict = {k.replace("_orig_mod.", ""): v for k, v in state_dict.items()}
 U_net.load_state_dict(state_dict)
 U_net.eval()
@@ -145,20 +195,23 @@ ts = torch.arange(T).to(device)
 alpha_bars = U_net.cosine_scheduler(ts)
 
 with torch.no_grad():
-    predicted_ct = ddpm_sample(U_net, sample_mri.to(device), alpha_bars) #just one batch
-val_l1 = F.l1_loss(predicted_ct, sample_ct.to(device)).item()
-val_ssim = ssim_loss(predicted_ct, sample_ct.to(device), window_size=11).item()
-print(f"L1: {val_l1:.4f}  SSIM: {val_ssim:.4f}")
+    pred_ddpm = ddpm_sample(U_net, sample_mri.to(device), alpha_bars)
+    pred_ddim = ddim_sample(U_net, sample_mri.to(device), alpha_bars)
+    pred_dpm  = DPM_sample(U_net, sample_mri.to(device), alpha_bars)
 
-fig, axes = plt.subplots(3, 8, figsize=(20, 8))
-for i in range(8):
-    axes[0, i].imshow(sample_mri[i, 0].cpu(), cmap='gray')
-    axes[1, i].imshow(sample_ct[i, 0].cpu(), cmap='gray')
-    axes[2, i].imshow(predicted_ct[i, 0].cpu().clamp(-1, 1), cmap='gray')
-    for row in axes[:, i]: row.axis('off')
-axes[0, 0].set_ylabel('MRI Input')
-axes[1, 0].set_ylabel('Real CT')
-axes[2, 0].set_ylabel('Predicted CT')
-plt.suptitle(f'L1: {val_l1:.4f}  SSIM: {val_ssim:.4f}')
+samples = [("DDPM", pred_ddpm), ("DDIM", pred_ddim), ("DPM-Solver-2", pred_dpm)]
+for name, pred in samples:
+    l1   = F.l1_loss(pred, sample_ct.to(device)).item()
+    ssim = ssim_loss(pred, sample_ct.to(device), window_size=11).item()
+    print(f"{name}  L1: {l1:.4f}  SSIM: {ssim:.4f}")
+
+fig, axes = plt.subplots(5, 8, figsize=(20, 12))
+rows = [("MRI Input", sample_mri), ("Real CT", sample_ct),
+        ("DDPM", pred_ddpm), ("DDIM", pred_ddim), ("DPM-Solver-2", pred_dpm)]
+for row_idx, (label, imgs) in enumerate(rows):
+    for i in range(8):
+        axes[row_idx, i].imshow(imgs[i, 0].cpu().clamp(-1, 1), cmap='gray')
+        axes[row_idx, i].axis('off')
+    axes[row_idx, 0].set_ylabel(label)
 plt.tight_layout()
 plt.show()
