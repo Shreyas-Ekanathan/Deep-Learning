@@ -6,7 +6,7 @@ from kornia.losses import ssim_loss
 import wandb
 import sys, os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
-import datagen
+import GNN.datagen as datagen
 
 #so we are implementing a GCN
 #messages are passed via aggregation just by summing surrounding hidden states
@@ -129,11 +129,11 @@ sol1 = simulate_trajectory(species1, pos_vector1[0], init_velocities1)
 species2, pos_vector2, init_velocities2 = true_traj2
 sol2 = simulate_trajectory(species2, pos_vector2[0], init_velocities2)
 
-from plot import plot_trajectory_paths, plot_deviation
+from GNN.plot import plot_trajectory_paths, plot_deviation
 
-plot_trajectory_paths(pos_vector1, sol1, save_path="traj1_paths.png")
-plot_deviation(pos_vector1, sol1, dt_per_snapshot=0.01, save_path="traj1_deviation.png")
+plot_trajectory_paths(pos_vector1, sol1, save_path="GNN/LJ_potentials/gcn_results/traj1_paths.png")
+plot_deviation(pos_vector1, sol1, dt_per_snapshot=0.01, save_path="GNN/LJ_potentials/gcn_results/traj1_deviation.png")
 
-plot_trajectory_paths(pos_vector2, sol2, save_path="traj2_paths.png")
-plot_deviation(pos_vector2, sol2, dt_per_snapshot=0.01, save_path="traj2_deviation.png")
+plot_trajectory_paths(pos_vector2, sol2, save_path="GNN/LJ_potentials/gcn_results/traj2_paths.png")
+plot_deviation(pos_vector2, sol2, dt_per_snapshot=0.01, save_path="GNN/LJ_potentials/gcn_results/traj2_deviation.png")
 
