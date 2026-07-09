@@ -16,4 +16,4 @@ MRI2CT/diffusion/wandb
 MRI2CT/data/__pycache__
 *.DS_Store
 *.pth
-GNN/LJ_potentials/__pycache__
+GNN/__pycache__

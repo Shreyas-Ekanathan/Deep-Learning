@@ -2,8 +2,6 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torch.utils.data import DataLoader, Dataset
-from kornia.losses import ssim_loss
-import wandb
 import sys, os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 import GNN.datagen as datagen
@@ -46,9 +44,9 @@ class GCN(nn.Module):
         input_graph = self.node_embedder(input_graph)
         for layer in self.layers[:-1]:
             transfer_layer, state_layer = layer[0], layer[1]
-            message = edges @ transfer_layer(input_graph) 
-            state_update = state_layer(input_graph)
-            input_graph = F.relu(state_update + message)
+            message = edges @ transfer_layer(input_graph) #transform the input graph, and then mask by the edges
+            state_update = state_layer(input_graph) #chooses how much of the current state to retain
+            input_graph = F.relu(state_update + message) #update
             
         layer = self.layers[-1]
         transfer_layer, state_layer = layer[0], layer[1]
@@ -73,6 +71,8 @@ test_loader = DataLoader(test_dataset, batch_size = 100, shuffle = False)
 
 for epoch in range(num_epochs):
     for node_features, adj_list, true_energy in train_loader:
+        #node_features is 9x5: 9 rows, each one 1-hot encoded
+        #adj_list is a 9x9 matrix where each entry is the dist between molecule i and j
         energy_pred = model(node_features, adj_list)
         loss = loss_fn(energy_pred, true_energy)
         loss.backward()
@@ -102,7 +102,7 @@ def simulate_trajectory(species, positions, init_velocities):
     def energy_and_forces(pos):
         diffs = pos.unsqueeze(2) - pos.unsqueeze(1)
         adj_list = torch.norm(diffs, dim=-1)  # differentiable
-        energy_pred = model(node_features, adj_list)
+        energy_pred = model(node_features, adj_list) * train_dataset.energy_std  # unnormalize
         forces_pred = -torch.autograd.grad(energy_pred.sum(), pos)[0]
         return forces_pred
 
@@ -131,9 +131,9 @@ sol2 = simulate_trajectory(species2, pos_vector2[0], init_velocities2)
 
 from GNN.plot import plot_trajectory_paths, plot_deviation
 
-plot_trajectory_paths(pos_vector1, sol1, save_path="GNN/LJ_potentials/gcn_results/traj1_paths.png")
-plot_deviation(pos_vector1, sol1, dt_per_snapshot=0.01, save_path="GNN/LJ_potentials/gcn_results/traj1_deviation.png")
+plot_trajectory_paths(pos_vector1, sol1, save_path="GNN/gcn_results/traj1_paths.png")
+plot_deviation(pos_vector1, sol1, dt_per_snapshot=0.01, save_path="GNN/gcn_results/traj1_deviation.png")
 
-plot_trajectory_paths(pos_vector2, sol2, save_path="GNN/LJ_potentials/gcn_results/traj2_paths.png")
-plot_deviation(pos_vector2, sol2, dt_per_snapshot=0.01, save_path="GNN/LJ_potentials/gcn_results/traj2_deviation.png")
+plot_trajectory_paths(pos_vector2, sol2, save_path="GNN/gcn_results/traj2_paths.png")
+plot_deviation(pos_vector2, sol2, dt_per_snapshot=0.01, save_path="GNN/gcn_results/traj2_deviation.png")
 
