@@ -51,7 +51,7 @@ class VAE(nn.Module): #borrowed from prev work
 
     def ELBO(self, out, target, mu, log_sigma, beta):
         mse = F.l1_loss(out, target, reduction='mean')
-        kl = -0.5 * torch.sum(1 + log_sigma - mu**2 - torch.exp(log_sigma))
+        kl = -0.5 * torch.mean(1 + log_sigma - mu**2 - torch.exp(log_sigma))
         loss = mse + beta * kl
         return loss
     
@@ -166,6 +166,8 @@ if __name__ == "__main__":
             "vae/ct_real":   wandb.Image((sample_ct[0] + 1) / 2),
             "vae/ct_recon":  wandb.Image((ct_recon[0].cpu() + 1) / 2),
         })
+        torch.save(mri_encoder.state_dict(), os.path.join(os.path.dirname(__file__), f"mri_encoder_epoch_{epoch}.pth"))
+        torch.save(CT_encoder.state_dict(),  os.path.join(os.path.dirname(__file__), f"ct_encoder_epoch_{epoch}.pth"))
 
     converter = MLP(latent_dim).to(device)
     converter_optimizer = torch.optim.Adam(converter.parameters(), lr=2e-4, weight_decay=1e-4)

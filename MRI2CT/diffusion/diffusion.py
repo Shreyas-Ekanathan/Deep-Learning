@@ -118,9 +118,15 @@ def ddpm_sample(model, mri, alpha_bars, T=1000):
         alpha_bar_prev = alpha_bars[t - 1] if t > 0 else torch.tensor(1.0).to(mri.device)
         
         # DDPM reverse step
-        x = (x - (1 - alpha_bar_t).sqrt() * predicted_noise) / alpha_bar_t.sqrt()
-        x = alpha_bar_prev.sqrt() * x + (1 - alpha_bar_prev).sqrt() * torch.randn_like(x)
-    
+        x_0_pred = ((x - (1 - alpha_bar_t).sqrt() * predicted_noise) / alpha_bar_t.sqrt()).clamp(-1, 1)
+        if t == 0:
+            x = x_0_pred
+            break
+        alpha_t = alpha_bar_t / alpha_bar_prev
+        beta_t = 1 - alpha_t
+        mean = (alpha_bar_prev.sqrt() * beta_t / (1 - alpha_bar_t)) * x_0_pred + (alpha_t.sqrt() * (1 - alpha_bar_prev) / (1 - alpha_bar_t)) * x
+        var = beta_t * (1 - alpha_bar_prev) / (1 - alpha_bar_t)
+        x = mean + var.sqrt() * torch.randn_like(x)
     return x
 
 def ddim_sample(model, mri, alpha_bars, T = 1000, num_steps = 50):
