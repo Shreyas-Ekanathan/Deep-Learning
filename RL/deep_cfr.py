@@ -129,7 +129,7 @@ for epoch in range(num_epochs):
             n += 1
             loss.backward()
             optimizer.step()
-            if (iteration > 5000): break
+            if (iteration > 5000): break #cap training
             
     average_loss = average_loss / n
     print(f"Epoch: {epoch + 1}, Average Loss = {average_loss}")
@@ -147,7 +147,7 @@ for epoch in range(num_epochs):
         logits = strategy(info)
         probs = F.softmax(logits, dim=1) #softmax to get p distr over actions
         per_sample = ((probs - target) ** 2).sum(dim=1)
-        loss = (t * per_sample).sum() / t.sum()
+        loss = (t * per_sample).sum() / t.sum() #weight by epoch
         average_loss += loss.item()
         loss.backward()
         optimizer.step()
@@ -158,6 +158,7 @@ for epoch in range(num_epochs):
 save_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "strategy_net.pth")
 torch.save(strategy.state_dict(), save_path)
 
+#evals
 POKER_ACTIONS = {0: "fold", 1: "call/check", 2: "raise/bet"}
 @torch.no_grad()
 def eval_strategy(net, num_hands=500, max_print=80):
@@ -187,7 +188,7 @@ def eval_strategy(net, num_hands=500, max_print=80):
                 dist = strat_at(state)
                 state.apply_action(random.choices(list(dist), weights=list(dist.values()))[0])
 
-    print(f"\nLearned strategy (deep CFR) — {len(seen)} infosets over {num_hands} sampled hands:")
+    print(f"\nLearned strategy (deep CFR): {len(seen)} infosets over {num_hands} sampled hands:")
     for key in sorted(seen)[:max_print]:
         dist = "  ".join(f"{POKER_ACTIONS[a]} {p:5.1%}" for a, p in sorted(seen[key].items()))
         print(f"  {key}\n      {dist}")
