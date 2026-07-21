@@ -134,3 +134,14 @@ for epoch in range(num_epochs):
         out_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "training_videos")
         os.makedirs(out_dir, exist_ok=True)
         imageio.mimsave(os.path.join(out_dir, f"dqn_epoch_{epoch}.mp4"), frames, fps=30, macro_block_size=1)
+
+# Epoch 90, Average Loss = 0.5549750328063965, Greedy average steps over 10 eps = 72.1
+# Epoch 91, Average Loss = 0.555826723575592, Greedy average steps over 10 eps = 76.0
+# Epoch 92, Average Loss = 0.559714138507843, Greedy average steps over 10 eps = 69.1
+# Epoch 93, Average Loss = 0.5620923638343811, Greedy average steps over 10 eps = 78.7
+# Epoch 94, Average Loss = 0.5611153841018677, Greedy average steps over 10 eps = 69.5
+# Epoch 95, Average Loss = 0.5626959800720215, Greedy average steps over 10 eps = 71.3
+# Epoch 96, Average Loss = 0.5708425641059875, Greedy average steps over 10 eps = 79.4
+# Epoch 97, Average Loss = 0.5718831419944763, Greedy average steps over 10 eps = 74.5
+# Epoch 98, Average Loss = 0.5735864043235779, Greedy average steps over 10 eps = 75.5
+# Epoch 99, Average Loss = 0.5746353268623352, Greedy average steps over 10 eps = 68.8

@@ -1,3 +1,6 @@
+#try to control the acrobot near the top of its swing
+#needs some edits to the acrobot env itself
+
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader, Dataset
@@ -5,6 +8,63 @@ import gymnasium as gym
 import numpy as np
 import os
 import imageio
+from gymnasium.envs.classic_control import AcrobotEnv
+
+# new acrobot class
+class StabilizeAcrobot(gym.Wrapper):
+    def __init__(self, max_steps=500, render_mode=None):
+        super().__init__(AcrobotEnv(render_mode=render_mode))
+        self.max_steps = max_steps
+        self._t = 0
+        #pull params from normal class
+        u = self.unwrapped
+        self.m1, self.m2 = u.LINK_MASS_1, u.LINK_MASS_2
+        self.l1 = u.LINK_LENGTH_1
+        self.lc1, self.lc2 = u.LINK_COM_POS_1, u.LINK_COM_POS_2
+        self.I1, self.I2 = u.LINK_MOI, u.LINK_MOI
+        self.g = 9.8
+
+    def reset(self, **kwargs):
+        self._t = 0
+        return self.env.reset(**kwargs)
+
+    def step(self, action):
+        obs, _, terminated, truncated, info = self.env.step(action)
+        self._t += 1
+        state  = self.unwrapped.state # [theta1, theta2, dtheta1, dtheta2]
+        torque = self.unwrapped.AVAIL_TORQUE[action] # applied torque
+        reward = self._reward(state, torque)
+        truncated = self._t >= self.max_steps
+        return obs, reward, False, truncated, info
+
+    def _reward(self, state, torque):
+        theta1, theta2, dtheta1, dtheta2 = state
+        
+        def wrap(angle):
+            return ((angle + np.pi) % (2 * np.pi)) - np.pi #keep it in range [-pi, pi]
+
+        deviation = np.array([wrap(theta1 - np.pi), wrap(theta2)])
+        velocity = np.array([dtheta1, dtheta2])
+        lambda_u = 0.9
+     
+        if (np.linalg.norm(deviation) < 0.75 and np.linalg.norm(velocity) < 2.0): 
+            # we are close to the top, want to encourage the model to stay here
+            Q = np.diag([10, 10])
+            return -deviation.T @ Q @ deviation - lambda_u * torque ** 2 - 0.6 * np.linalg.norm(velocity) ** 2
+        else:
+            #need to find kinetic, potential energy
+            #push towards that energy level
+            V = (-self.m1 * self.g * self.lc1 * np.cos(theta1) - self.m2 * self.g * (self.l1 * np. cos(theta1) + 
+                                                                                    self.lc2 * np.cos(theta1 + theta2)))
+            M11 = (self.m1 * self.lc1 ** 2 + self.m2 * (self.l1 ** 2 + self.lc2 ** 2 + 2 * self.l1 * self.lc2 * np.cos(theta2)) 
+                    + self.I1 + self.I2)
+            
+            M12 = self.m2 * (self.lc2 ** 2 + self.l1 * self.lc2 * np.cos(theta2)) + self.I2
+            M22 = self.m2 * self.lc2 ** 2 + self.I2
+            K = 0.5 * (M11 * dtheta1 ** 2 + 2 * M12 * dtheta1 * dtheta2 + M22 * dtheta2 ** 2)
+            E  = V + K
+            E_target = self.m1 * self.g * self.lc1 + self.m2 * self.g * (self.l1 + self.lc2)
+            return -(E - E_target)**2 - lambda_u * torque ** 2
 
 class PPO(nn.Module):
     def __init__(self, input_shape, output_shape):
@@ -102,10 +162,10 @@ class data_loader(Dataset):
 num_trajectories = 100
 num_iters = 50
 optimizer = torch.optim.Adam(list(controller.parameters()) + list(critic.parameters()), lr=1e-3)
-num_epochs = 5
+num_epochs = 10
 scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=num_iters, eta_min=1e-5)
-env = gym.make("Acrobot-v1")
-eval_env = gym.make("Acrobot-v1")
+env = StabilizeAcrobot()
+eval_env = StabilizeAcrobot()
 
 for iter in range(num_iters):
     #generate trajectoreis now
@@ -140,22 +200,40 @@ for iter in range(num_iters):
     total_steps = 0
     for _ in range(eval_episodes):
         eval_state, _ = eval_env.reset()
-        steps = 0
+        good_steps = 0
+        all_steps = 0
         eval_done = False
+        
+        def check_step(state):
+            theta1, theta2, dtheta1, dtheta2 = state
+            
+            def wrap(angle):
+                return ((angle + np.pi) % (2 * np.pi)) - np.pi #keep it in range [-pi, pi]
+
+            deviation = np.array([wrap(theta1 - np.pi), wrap(theta2)])
+            velocity = np.array([dtheta1, dtheta2])
+     
+            if (np.linalg.norm(deviation) < 0.3 and np.linalg.norm(velocity) < 1): 
+                return True
+        
+            return False
+
         while not eval_done:
             with torch.no_grad():
                 eval_action = int(controller(torch.tensor(eval_state, dtype=torch.float32)).argmax())
             eval_state, _, term, trunc, _ = eval_env.step(eval_action)
-            steps += 1
+            all_steps += 1
+            if (check_step(eval_env.unwrapped.state)): good_steps += 1
             eval_done = term or trunc
-        total_steps += steps
+            
+        total_steps += good_steps / all_steps
     avg_steps = total_steps / eval_episodes
         
-    print(f"Iteration {iter}, Greedy average steps over {eval_episodes} eps = {avg_steps}")
+    print(f"Iteration {iter}, Average fraction of steps in target regime = {avg_steps}")
 
     #save video of performance every 5 iterations
     if (iter % 5 == 0):
-        video_env = gym.make("Acrobot-v1", render_mode="rgb_array")
+        video_env = StabilizeAcrobot(render_mode="rgb_array")
         vs, _ = video_env.reset()
         frames = [video_env.render()]
         done = False
@@ -166,13 +244,6 @@ for iter in range(num_iters):
             frames.append(video_env.render())
             done = term or trunc
         video_env.close()
-        out_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "training_videos")
+        out_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "stabilization_training_videos")
         os.makedirs(out_dir, exist_ok=True)
-        imageio.mimsave(os.path.join(out_dir, f"ppo_iter_{iter}.mp4"), frames, fps=30, macro_block_size=1)
-
-
-# Iteration 45, Greedy average steps over 10 eps = 78.8
-# Iteration 46, Greedy average steps over 10 eps = 87.7
-# Iteration 47, Greedy average steps over 10 eps = 71.8
-# Iteration 48, Greedy average steps over 10 eps = 92.2
-# Iteration 49, Greedy average steps over 10 eps = 77.7
+        imageio.mimsave(os.path.join(out_dir, f"stabilization_ppo_iter_{iter}.mp4"), frames, fps=30, macro_block_size=1)
