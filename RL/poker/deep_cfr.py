@@ -45,21 +45,22 @@ def deep_CFR(state, player, regret_buffer, strategy_buffer, t):
         strat = regret_matching(regret_predictors[curr_player](torch.tensor(input, dtype=torch.float32)), actions)
         
     if (player != curr_player):
-        opt = random.choices(list(strat), weights=list(strat.values()))[0]
+        opt = random.choices(list(strat), weights=list(strat.values()))[0] #just do something
         strat_vector = np.zeros(game.num_distinct_actions(), dtype=np.float32)
         for a in actions:
             strat_vector[a] = strat[a]
-        add(strategy_buffer[player], ((np.array(input), t, strat_vector)))
+        add(strategy_buffer[player], ((np.array(input), t, strat_vector))) #store for training
         return deep_CFR(state.child(opt), player, regret_buffer, strategy_buffer, t)
 
+    #our turn, lets do something!
     values, node_value = {}, 0.0
-    for a in actions:
+    for a in actions: #sample each aciton
         values[a] = deep_CFR(state.child(a), player, regret_buffer, strategy_buffer, t)
-        node_value += strat[a] * values[a]
+        node_value += strat[a] * values[a] #EV
 
     regret = np.zeros(game.num_distinct_actions(), dtype=np.float32)
     for a in actions:
-        regret[a] = values[a] - node_value
+        regret[a] = values[a] - node_value #could we have done better than average?
         
     add(regret_buffer[player], ((np.array(state.information_state_tensor(player)), t, regret)))
     return node_value
