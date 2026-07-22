@@ -8,13 +8,14 @@ import gymnasium as gym
 import numpy as np
 import os
 import imageio
-from gymnasium.envs.classic_control import AcrobotEnv
+from gymnasium import spaces
+from gymnasium.envs.classic_control.acrobot import AcrobotEnv, wrap, bound, rk4
 
 # new acrobot class
-#lets make the model continuous now - it can take continuous actions (space is no longer discrete)
-class StabilizeAcrobot(gym.Wrapper):
-    def __init__(self, max_steps=500, render_mode=None):
-        super().__init__(AcrobotEnv(render_mode=render_mode))
+#lets make the model continuous now -> it can take continuous actions (space is no longer discrete)
+class StabilizeAcrobot(AcrobotEnv):
+    def __init__(self, max_steps=500, render_mode=None, max_torque = 1.0):
+        super().__init__(render_mode=render_mode)
         self.max_steps = max_steps
         self._t = 0
         #pull params from normal class
@@ -24,20 +25,31 @@ class StabilizeAcrobot(gym.Wrapper):
         self.lc1, self.lc2 = u.LINK_COM_POS_1, u.LINK_COM_POS_2
         self.I1, self.I2 = u.LINK_MOI, u.LINK_MOI
         self.g = 9.8
+        self.max_torque = max_torque
+        self.action_space = spaces.Box( #continuous space
+            low=-max_torque, high=max_torque, shape=(1,), dtype=np.float32
+        )
+
 
     def reset(self, **kwargs):
         self._t = 0
-        return self.env.reset(**kwargs)
+        return super().reset(**kwargs)
 
-    def step(self, action):
-        obs, _, terminated, truncated, info = self.env.step(action)
+    def step(self, a):
+        s = self.state
+        torque = float(np.clip(a, -self.max_torque, self.max_torque)) #make torque continuous
+        s_augmented = np.append(s, torque) #same as normal
+        ns = rk4(self._dsdt, s_augmented, [0, self.dt])
+        ns[0] = wrap(ns[0], -np.pi, np.pi)
+        ns[1] = wrap(ns[1], -np.pi, np.pi)
+        ns[2] = bound(ns[2], -self.MAX_VEL_1, self.MAX_VEL_1)
+        ns[3] = bound(ns[3], -self.MAX_VEL_2, self.MAX_VEL_2)
+        self.state = ns
+        if self.render_mode == "human":
+            self.render()
         self._t += 1
-        state  = self.unwrapped.state # [theta1, theta2, dtheta1, dtheta2]
-        torque = self.unwrapped.AVAIL_TORQUE[action] # applied torque
-        reward = self._reward(state, torque)
-        truncated = self._t >= self.max_steps
-        return obs, reward, False, truncated, info
-
+        return self._get_ob(), self._reward(self.state, torque), False, self._t >= self.max_steps, {}
+    
     def _reward(self, state, torque):
         theta1, theta2, dtheta1, dtheta2 = state
         
@@ -48,10 +60,11 @@ class StabilizeAcrobot(gym.Wrapper):
         velocity = np.array([dtheta1, dtheta2])
         lambda_u = 0.9
      
+        reward = 0
         if (np.linalg.norm(deviation) < 0.75 and np.linalg.norm(velocity) < 2.0): 
             # we are close to the top, want to encourage the model to stay here
             Q = np.diag([10, 10])
-            return -deviation.T @ Q @ deviation - lambda_u * torque ** 2 - 0.6 * np.linalg.norm(velocity) ** 2
+            reward = (-deviation.T @ Q @ deviation - lambda_u * torque ** 2 - 0.6 * np.linalg.norm(velocity) ** 2) * 10
         else:
             #need to find kinetic, potential energy
             #push towards that energy level
@@ -65,7 +78,13 @@ class StabilizeAcrobot(gym.Wrapper):
             K = 0.5 * (M11 * dtheta1 ** 2 + 2 * M12 * dtheta1 * dtheta2 + M22 * dtheta2 ** 2)
             E  = V + K
             E_target = self.m1 * self.g * self.lc1 + self.m2 * self.g * (self.l1 + self.lc2)
-            return -(E - E_target)**2 - lambda_u * torque ** 2
+            reward = (-np.abs(E - E_target) - lambda_u * torque ** 2) * 0.0001
+            
+        height = -np.cos(theta1) - np.cos(theta1 + theta2) 
+        up = (height + 2) / 4 # normalized 
+
+        stabilizer = up - 0.05 * up * (dtheta1 ** 2 + dtheta2 ** 2) - 0.001 * torque ** 2
+        return stabilizer
 
 class PPO(nn.Module):
     def __init__(self, input_shape, output_shape):
@@ -77,8 +96,7 @@ class PPO(nn.Module):
             nn.ReLU(),
             nn.Linear(256, 256),
             nn.ReLU(),
-            nn.Linear(256, output_shape), #one output per action, will become a probability distribution
-            nn.Softmax(dim=-1)
+            nn.Linear(256, 2), #output the mean, std of the torque distribution
         )
     
     def forward(self, state):
@@ -104,46 +122,57 @@ output_shape = 3
 controller = PPO(input_shape, output_shape)
 critic = CRITIC(input_shape)
 
-def loss(state, action, logits, old_logits, critic_target, advantage, epsilon, c1, c2):
+def loss(state, action, logits, old_logits, critic_target, advantage, entropy, epsilon, c1, c2):
     #actor loss terms
     baseline = critic(state)
-    action_probs = logits.gather(1, action.unsqueeze(1)).squeeze(1) 
-    prob = torch.exp(torch.log(action_probs) - old_logits) 
+    prob = torch.exp(logits - old_logits)    
     actor_loss = (torch.minimum(prob * advantage, torch.clip(prob, 1 - epsilon, 1 + epsilon) * advantage)).mean() # PPO update
     
     #critic loss terms
     critic_loss = ((baseline.squeeze(-1) - critic_target) ** 2).mean() #MSE, get close to the true value
-    
-    #entropy
-    entropy = (logits * torch.log(logits)).sum(dim=1).mean()
-    
-    return -actor_loss + c1 * critic_loss + c2 * entropy
+        
+    return -actor_loss + c1 * critic_loss - c2 * entropy
 
 #training loop now
 def gen_traj_with_labels():
     traj = []
     state, info = env.reset()
+    if np.random.random() < 0.2:
+        #teach policy to learn how to balance near the top half the time
+        theta1_deviation = np.random.uniform(-0.15, 0.15)
+        theta2_deviation = np.random.uniform(-0.15, 0.15)
+        v1 = np.random.uniform(-0.75, 0.75)
+        v2 = np.random.uniform(-0.75, 0.75)
+        env.state = np.array([np.pi + theta1_deviation, theta2_deviation, v1, v2])
+        state = env._get_ob()
     done = False
     with torch.no_grad():
         while not done:
-            dist = torch.distributions.Categorical(probs=controller(torch.tensor(state, dtype=torch.float32)))
+            mu, log_std = controller(torch.tensor(state, dtype=torch.float32))
+            log_std = torch.clamp(log_std, -5, 2)
+            std = torch.exp(log_std)
+            dist = torch.distributions.Normal(mu, std)
             action = dist.sample()
             next_state, reward, terminated, truncated, info = env.step(action.item())
             done = terminated or truncated
             value = critic(torch.tensor(state, dtype=torch.float32))
-            traj.append((state, action, reward, dist.log_prob(action), value))
+            traj.append((state, action, reward, dist.log_prob(action).sum(-1), value))
             state = next_state
         
     #now we need to backtrack to find the critic targets
     gamma = 0.995
     final_data = []
-    return_prev = 0
-    for data in reversed(traj):
+    V_prev = 0
+    advantage_prev = 0
+    for (i, data) in enumerate(reversed(traj)):
+        #swap to a GAE scheme
         state, action, reward, old_log_prob, value = data
-        return_t = reward + gamma * return_prev
-        advantage_t = return_t - value
+        delta_t = reward + gamma * V_prev - value
+        advantage_t = delta_t + gamma * 0.95 * advantage_prev
+        return_t = advantage_t + value
+        advantage_prev = advantage_t
+        V_prev = value
         final_data.append((state, action, old_log_prob, advantage_t, return_t))
-        return_prev = return_t
     
     return final_data
 
@@ -155,13 +184,13 @@ class data_loader(Dataset):
     def __getitem__(self, i):
         state, action, old_log_prob, advantage, ret = self.samples[i]
         return (torch.tensor(state, dtype=torch.float32),
-                torch.tensor(int(action), dtype=torch.long),
+                torch.tensor(float(action), dtype=torch.float32),
                 torch.tensor(float(old_log_prob), dtype=torch.float32),
                 torch.tensor(float(advantage), dtype=torch.float32),
                 torch.tensor(float(ret), dtype=torch.float32))
 
-num_trajectories = 100
-num_iters = 50
+num_trajectories = 150
+num_iters = 75
 optimizer = torch.optim.Adam(list(controller.parameters()) + list(critic.parameters()), lr=1e-3)
 num_epochs = 10
 scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=num_iters, eta_min=1e-5)
@@ -185,9 +214,16 @@ for iter in range(num_iters):
         avg_loss = 0
         for sample in loader:            
             state, action, old_log_prob, advantage, returns = sample
-            logits = controller(state)
+            out = controller(state) 
+            mu = out[:, 0]
+            log_std = out[:, 1]
+            log_std = torch.clamp(log_std, -5, 2)
+            std = torch.exp(log_std)
+            dist = torch.distributions.Normal(mu, std)
+            entropy = dist.entropy().mean() #for loss function
+            new_logprob = dist.log_prob(action)
             optimizer.zero_grad()
-            l = loss(state, action, logits, old_log_prob, returns, advantage, 0.2, 0.5, 0.01)
+            l = loss(state, action, new_logprob, old_log_prob, returns, advantage, entropy, 0.2, 0.5, 0.01)
             avg_loss += l
             l.backward()
             optimizer.step()
@@ -221,8 +257,8 @@ for iter in range(num_iters):
 
         while not eval_done:
             with torch.no_grad():
-                eval_action = int(controller(torch.tensor(eval_state, dtype=torch.float32)).argmax())
-            eval_state, _, term, trunc, _ = eval_env.step(eval_action)
+                mu, _ = controller(torch.tensor(eval_state, dtype=torch.float32))
+            eval_state, _, term, trunc, _ = eval_env.step(mu)
             all_steps += 1
             if (check_step(eval_env.unwrapped.state)): good_steps += 1
             eval_done = term or trunc
@@ -240,8 +276,8 @@ for iter in range(num_iters):
         done = False
         while not done:
             with torch.no_grad():
-                a = int(controller(torch.tensor(vs, dtype=torch.float32)).argmax())
-            vs, _, term, trunc, _ = video_env.step(a)
+                mu, _ = controller(torch.tensor(vs, dtype=torch.float32))
+            vs, _, term, trunc, _ = video_env.step(mu)
             frames.append(video_env.render())
             done = term or trunc
         video_env.close()
