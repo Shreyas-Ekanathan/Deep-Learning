@@ -42,7 +42,7 @@ Final reward: `2·height - 0.1·min(|E-E*|,60) - 0.25·up²·min(‖v‖²,40) -
 
 Videos are in the training-videos folder. The continuous model starts to hold itself up around iteration 40, and by iterations 140-150 it reliably swings up and stays near vertical.
 
-Over 200 episodes it keeps ~0.30 of steps in the target set, up from 0.17 and 0.25 on earlier runs. The honest catch: this is a limit cycle, not a real hold. Longest continuous hold is ~16 steps and no episode holds for 100+ steps in a row. It dwells near the top in short bursts rather than locking in, which is about the ceiling for one end-to-end policy on this equilibrium.
+Over 200 episodes it keeps ~0.30 of steps in the target set, up from 0.17 and 0.25 on earlier runs. The honest catch: this is a limit cycle, not a real hold. Longest continuous hold is 16 steps and no episode holds for 100+ steps in a row. It dwells near the top in short bursts rather than locking in, which is about the ceiling for one end-to-end policy on this equilibrium.
 
 ## LQR handoff (`hybrid_controller.py`)
 
@@ -56,7 +56,7 @@ Over 200 episodes:
 | metric | pure PPO | PPO + LQR |
 |---|---|---|
 | fraction in target | 0.29 | 0.33 |
-| longest continuous hold | 20 steps | 150 median, 400 max |
+| longest continuous hold | 16 steps | 150 median, 400 max |
 | episodes holding 100+ steps | 0% | 58% |
 
 The fraction barely moves and its variance jumps because performance is now bimodal: when the LQR catches, it holds dead vertical for most of the episode; when the swing-up arrives too fast, it misses that episode. The longest-hold row is the honest one and goes from "never holds" to "holds indefinitely most of the time." Demo rollouts are in `final_hybrid_videos/`.
