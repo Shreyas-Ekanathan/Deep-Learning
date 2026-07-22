@@ -4,7 +4,6 @@
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader, Dataset
-import gymnasium as gym
 import numpy as np
 import os
 import imageio
@@ -58,36 +57,36 @@ class StabilizeAcrobot(AcrobotEnv):
 
         deviation = np.array([wrap(theta1 - np.pi), wrap(theta2)])
         velocity = np.array([dtheta1, dtheta2])
-        lambda_u = 0.9
      
-        reward = 0
-        if (np.linalg.norm(deviation) < 0.75 and np.linalg.norm(velocity) < 2.0): 
-            # we are close to the top, want to encourage the model to stay here
-            Q = np.diag([10, 10])
-            reward = (-deviation.T @ Q @ deviation - lambda_u * torque ** 2 - 0.6 * np.linalg.norm(velocity) ** 2) * 10
-        else:
-            #need to find kinetic, potential energy
-            #push towards that energy level
-            V = (-self.m1 * self.g * self.lc1 * np.cos(theta1) - self.m2 * self.g * (self.l1 * np. cos(theta1) + 
-                                                                                    self.lc2 * np.cos(theta1 + theta2)))
-            M11 = (self.m1 * self.lc1 ** 2 + self.m2 * (self.l1 ** 2 + self.lc2 ** 2 + 2 * self.l1 * self.lc2 * np.cos(theta2)) 
-                    + self.I1 + self.I2)
-            
-            M12 = self.m2 * (self.lc2 ** 2 + self.l1 * self.lc2 * np.cos(theta2)) + self.I2
-            M22 = self.m2 * self.lc2 ** 2 + self.I2
-            K = 0.5 * (M11 * dtheta1 ** 2 + 2 * M12 * dtheta1 * dtheta2 + M22 * dtheta2 ** 2)
-            E  = V + K
-            E_target = self.m1 * self.g * self.lc1 + self.m2 * self.g * (self.l1 + self.lc2)
-            reward = (-np.abs(E - E_target) - lambda_u * torque ** 2) * 0.0001
-            
+        V = (-self.m1 * self.g * self.lc1 * np.cos(theta1) - self.m2 * self.g * (self.l1 * np. cos(theta1) + 
+                                                                                self.lc2 * np.cos(theta1 + theta2)))
+        M11 = (self.m1 * self.lc1 ** 2 + self.m2 * (self.l1 ** 2 + self.lc2 ** 2 + 2 * self.l1 * self.lc2 * np.cos(theta2)) 
+                + self.I1 + self.I2)
+        
+        M12 = self.m2 * (self.lc2 ** 2 + self.l1 * self.lc2 * np.cos(theta2)) + self.I2
+        M22 = self.m2 * self.lc2 ** 2 + self.I2
+        K = 0.5 * (M11 * dtheta1 ** 2 + 2 * M12 * dtheta1 * dtheta2 + M22 * dtheta2 ** 2)
+        E  = V + K
+        E_target = self.m1 * self.g * self.lc1 + self.m2 * self.g * (self.l1 + self.lc2)
+        energy_reward = -0.1 * np.minimum(np.abs(E - E_target), 60) #cap the reward
+        
         height = -np.cos(theta1) - np.cos(theta1 + theta2) 
-        up = (height + 2) / 4 # normalized 
+        height_reward = height * 2
+        
+        up = (height + 2) / 4
+        top_gate = up ** 2 
+        velocity_penalty = 0.25 * top_gate * np.minimum(np.linalg.norm(velocity) ** 2, 40)
+        deviation_penalty = 0.25 * top_gate * np.linalg.norm(deviation)
 
-        stabilizer = up - 0.05 * up * (dtheta1 ** 2 + dtheta2 ** 2) - 0.001 * torque ** 2
-        return stabilizer
+        reward = height_reward + energy_reward - velocity_penalty - deviation_penalty - 0.001 * torque ** 2
+
+        if (np.linalg.norm(deviation) < 0.5 and np.linalg.norm(velocity) < 0.8):
+            reward += 2 #bonus for landing in an ideal area 
+
+        return reward
 
 class PPO(nn.Module):
-    def __init__(self, input_shape, output_shape):
+    def __init__(self, input_shape):
         super().__init__()
         self.layers = nn.Sequential(
             nn.Linear(input_shape, 256),
@@ -96,11 +95,16 @@ class PPO(nn.Module):
             nn.ReLU(),
             nn.Linear(256, 256),
             nn.ReLU(),
-            nn.Linear(256, 2), #output the mean, std of the torque distribution
+            nn.Linear(256, 1), #output the mean
+            nn.Tanh() #scale to (-1, 1), which is the legal range of torques
         )
+        
+        self.log_std = nn.Parameter(torch.zeros(1))
     
     def forward(self, state):
-        return self.layers(state) #logits per action
+        mu = self.layers(state) #logits per action
+        log_std = self.log_std.expand_as(mu) 
+        return torch.cat([mu, log_std], dim = -1)
 
 class CRITIC(nn.Module):
     def __init__(self, input_shape):
@@ -118,11 +122,10 @@ class CRITIC(nn.Module):
 
 
 input_shape = 6
-output_shape = 3
-controller = PPO(input_shape, output_shape)
+controller = PPO(input_shape)
 critic = CRITIC(input_shape)
 
-def loss(state, action, logits, old_logits, critic_target, advantage, entropy, epsilon, c1, c2):
+def loss(state, logits, old_logits, critic_target, advantage, entropy, epsilon, c1, c2):
     #actor loss terms
     baseline = critic(state)
     prob = torch.exp(logits - old_logits)    
@@ -137,8 +140,8 @@ def loss(state, action, logits, old_logits, critic_target, advantage, entropy, e
 def gen_traj_with_labels():
     traj = []
     state, info = env.reset()
-    if np.random.random() < 0.2:
-        #teach policy to learn how to balance near the top half the time
+    if np.random.random() < 0.3:
+        #teach policy to learn how to balance near the top part of the time
         theta1_deviation = np.random.uniform(-0.15, 0.15)
         theta2_deviation = np.random.uniform(-0.15, 0.15)
         v1 = np.random.uniform(-0.75, 0.75)
@@ -164,7 +167,7 @@ def gen_traj_with_labels():
     final_data = []
     V_prev = 0
     advantage_prev = 0
-    for (i, data) in enumerate(reversed(traj)):
+    for data in reversed(traj):
         #swap to a GAE scheme
         state, action, reward, old_log_prob, value = data
         delta_t = reward + gamma * V_prev - value
@@ -190,12 +193,15 @@ class data_loader(Dataset):
                 torch.tensor(float(ret), dtype=torch.float32))
 
 num_trajectories = 150
-num_iters = 75
-optimizer = torch.optim.Adam(list(controller.parameters()) + list(critic.parameters()), lr=1e-3)
-num_epochs = 10
-scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=num_iters, eta_min=1e-5)
+num_iters = 151
+optimizer = torch.optim.Adam(list(controller.parameters()) + list(critic.parameters()), lr=2e-3)
+num_epochs = 8
+scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=num_iters, eta_min=5e-5)
 env = StabilizeAcrobot()
 eval_env = StabilizeAcrobot()
+
+best_fraction = -1.0  # track the best eval so far so we can checkpoint improvements
+ckpt_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "best_stabilizer.pt")
 
 for iter in range(num_iters):
     #generate trajectoreis now
@@ -223,9 +229,10 @@ for iter in range(num_iters):
             entropy = dist.entropy().mean() #for loss function
             new_logprob = dist.log_prob(action)
             optimizer.zero_grad()
-            l = loss(state, action, new_logprob, old_log_prob, returns, advantage, entropy, 0.2, 0.5, 0.01)
+            l = loss(state, new_logprob, old_log_prob, returns, advantage, entropy, 0.2, 0.4, 0.01)
             avg_loss += l
             l.backward()
+            torch.nn.utils.clip_grad_norm_(list(controller.parameters()) + list(critic.parameters()), 0.5)
             optimizer.step()
         print(f"Iteration {iter}, Epoch {epoch}, Average loss: {avg_loss / (len(loader))}")
             
@@ -267,6 +274,17 @@ for iter in range(num_iters):
     avg_steps = total_steps / eval_episodes
         
     print(f"Iteration {iter}, Average fraction of steps in target regime = {avg_steps}")
+
+    #checkpoint whenever we hit a new best eval fraction
+    if avg_steps > best_fraction:
+        best_fraction = avg_steps
+        torch.save({
+            "controller": controller.state_dict(),
+            "critic": critic.state_dict(),
+            "iter": iter,
+            "fraction": avg_steps,
+        }, ckpt_path)
+        print(f"  -> new best ({avg_steps:.4f}), saved to {ckpt_path}")
 
     #save video of performance every 5 iterations
     if (iter % 5 == 0):
