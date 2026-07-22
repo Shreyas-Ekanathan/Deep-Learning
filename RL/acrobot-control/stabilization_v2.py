@@ -140,7 +140,7 @@ def loss(state, logits, old_logits, critic_target, advantage, entropy, epsilon, 
 def gen_traj_with_labels():
     traj = []
     state, info = env.reset()
-    if np.random.random() < 0.3:
+    if np.random.random() < 0.4:
         #teach policy to learn how to balance near the top part of the time
         theta1_deviation = np.random.uniform(-0.15, 0.15)
         theta2_deviation = np.random.uniform(-0.15, 0.15)
@@ -195,7 +195,7 @@ class data_loader(Dataset):
 num_trajectories = 150
 num_iters = 151
 optimizer = torch.optim.Adam(list(controller.parameters()) + list(critic.parameters()), lr=2e-3)
-num_epochs = 8
+num_epochs = 6
 scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=num_iters, eta_min=5e-5)
 env = StabilizeAcrobot()
 eval_env = StabilizeAcrobot()
