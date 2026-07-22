@@ -2,7 +2,7 @@
 
 A progression of control tasks on the underactuated Acrobot (torque only on the second joint), everything hand-rolled, with networks, losses, training loops, and a custom continuous-action env. Convention, as per acrobot environment, is that `θ1 = 0` hangs down, **upright is `θ1 = π, θ2 = 0`**.
 
-The four files build up in difficulty, from "reach the top" to "swing up *and* balance there." The first three are warm-ups solved quickly; the last — continuous stabilization — is the main effort and the focus below.
+The files build up in difficulty, from "reach the top" to "swing up *and* balance there." The first three are warm-ups solved quickly; the last — continuous stabilization — is the main effort and the focus below, finished off with an LQR handoff (`hybrid_controller.py`) that finally sticks the balance.
 
 ## The warm-ups
 
@@ -43,3 +43,24 @@ The bulk of the effort. Each reward fixed the previous one's failure mode:
 - Particularly interesting is the training progression of the continuous stabilization model, it really starts to learn
 what its doing around epoch 40. 
 - End results showed that it could keep around 30% of the steps in the target regime (see iterations 140, 145, 150, where we see the model really learning to hold itself up as opposed to prior results). The model struggles with stabilization (roughly 20 step vertical bursts), but clearly has learned and made progress.
+
+## Sticking the landing: LQR handoff (`hybrid_controller.py`)
+
+Evaluating the trained policy over 200 episodes exposed the real limit: the ~30% fraction is accumulated from **short bursts** — longest continuous hold ~16 steps, and *zero* episodes hold for ≥100 steps in a row. It reaches the top and dwells briefly but never truly locks in. That's fundamental: the upright is an unstable equilibrium, and one end-to-end policy learning both the global swing-up and the razor-thin local balance is asking a lot.
+
+The classical fix is a **hybrid controller**: let the learned policy do the swing-up (which it's great at), and hand off to a small analytic **LQR** balance controller once near the top. This is purely an *execution-time* switch — no retraining, no reward change (unlike the earlier discontinuous *reward*, which hurt learning, a discontinuity in the *control law* is standard and fine):
+
+- Linearize the dynamics about the upright (numerically, via finite differences on the env), solve the continuous-time Riccati equation for the gain `K`.
+- Far from the top → learned PPO policy. Near the top (`‖dev‖<0.3, ‖v‖<3`) → `τ = −K·[dev; vel]`, with hysteresis (drop back to the policy if it falls past `‖dev‖>0.6`).
+
+Result — the handoff converts brief dwelling into a genuine indefinite hold:
+
+| metric (200 eps) | pure PPO | PPO swing-up + LQR |
+|---|---|---|
+| fraction in target | 0.29 | 0.33 |
+| longest continuous hold | ~16 steps | **~150 (median), 400 max** |
+| episodes holding ≥100 steps | **0%** | **~58%** |
+
+The fraction barely moves (and its variance jumps) because performance is now bimodal — when the LQR catches, it holds dead-vertical for most of the episode; when the swing-up arrives too fast to catch, it misses that episode. The longest-hold metric is the honest one, and it goes from "never holds" to "holds indefinitely in the majority of episodes." Demo rollouts in `final_hybrid_videos/`.
+
+Takeaway: end-to-end RL nails the hard nonlinear swing-up; a two-line optimal-control law nails the local balance the policy couldn't. Using each tool for the part it's best at beats forcing one to do both.
