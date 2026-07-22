@@ -42,4 +42,4 @@ The bulk of the effort. Each reward fixed the previous one's failure mode:
 - All videos of training are shown in the corresponding videos of training folder.
 - Particularly interesting is the training progression of the continuous stabilization model, it really starts to learn
 what its doing around epoch 40. 
-- End results showed that it could keep around 31% of the steps in the target regime (see iterations 140, 145, 150, where we see the model really learning to hold itself up as opposed to prior results). 
+- End results showed that it could keep around 31% of the steps in the target regime (see iterations 140, 145, 150, where we see the model really learning to hold itself up as opposed to prior results). The model struggles with stabilization (roughly 20 step vertical bursts), but clearly has learned and made progress.
