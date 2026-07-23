@@ -1,8 +1,8 @@
 # Deep Learning (from scratch)
 
-A portfolio built from the ground up. The foundational architectures are each implemented twice: once from scratch in numpy with hand-derived backprop, then again in PyTorch. The larger projects build on that toward applied and research-adjacent work. (Numerical-methods and SciML work lives in separate repos; this is the ML side.)
-
 The goal of this work was to explore the trajectory of deep learning in depth (get it?). To that end, I focused on understanding the underlying mechanisms that drive deep learning, instead of just learning how to make function calls. That desire is reflected in my foundational projects, where I implemented an MLP, CNN, and RNN from scratch, including rolling out backprop. From there, I started branching into modern deep learning, exploring the state of the art architectures and trying out some projects of my own interest. The result is this portfolio. 
+
+This is a portfolio built from the ground up, as I started learning ML in the summer of 2026. The foundational architectures are each implemented twice: once from scratch in numpy with hand-derived backprop, then again in PyTorch. The larger projects build on that toward applied and research-adjacent work. I plan on continuing to develop and enhance the projects here. 
 
 ## Main projects
 
