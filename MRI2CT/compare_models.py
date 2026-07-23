@@ -13,7 +13,9 @@ from data.dataset import MRI_CT_DATASET
 
 device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
 
-# Diffusion samples iteratively, so scoring the full 6778-slice test set is slow.
+#ai written comparison file
+#just for results analysis
+
 NUM_EVAL_BATCHES = 25
 BATCH_SIZE = 8
 DDIM_STEPS = 300 # diffusion sampler steps 
