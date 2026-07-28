@@ -1,6 +1,6 @@
 # MRI to CT Translation (from scratch)
 
-Six architectures for translating MRI scans to CT scans, going from basic supervised to unsupervised to generative. Dataset is paired MRI/CT slices, 128x128 grayscale, normalized to [-1, 1].
+We explore six architectures for translating MRI scans to CT scans, going from basic supervised to unsupervised to generative. Dataset is paired MRI/CT slices, 128x128 grayscale, normalized to [-1, 1].
 
 ## Models
 
