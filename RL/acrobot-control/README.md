@@ -1,4 +1,4 @@
-# Acrobot Control (from scratch)
+# Acrobot Control
 
 Control tasks on the underactuated Acrobot (torque only on the second joint). Everything is hand-rolled: networks, losses, training loops, and a custom continuous-action env. Convention (from the Acrobot env): `θ1 = 0` hangs down, upright is `θ1 = π, θ2 = 0`.
 
