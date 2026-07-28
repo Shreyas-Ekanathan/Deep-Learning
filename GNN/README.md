@@ -1,4 +1,4 @@
-# GNN interatomic potentials (from scratch)
+# GNN interatomic potentials 
 
 Learn the energy of a 2D Lennard-Jones system with a GNN, get forces by differentiating the energy, then run the learned potential forward as a molecular dynamics sim. Everything hand-rolled: message passing, attention, the data generator, the Verlet integrator.
 
@@ -20,7 +20,7 @@ Setup: 9 particles, 5 species, on a plane. Fully-connected graph, where nodes ar
 | GAT (energy) | 0.31 | 3.9 |
 | GAT (energy + force) | 0.44 | 2.7 |
 
-Two clean wins: GAT beats GCN on forces by ~3.6x, and adding the force loss cuts force error another ~33% for a small energy cost. That energy-for-force trade is the standard result for ML potentials, and forces are what you want for dynamics.
+We achieve two clean wins: GAT beats GCN on forces by ~3.6x, and adding the force loss cuts force error another ~33% for a small energy cost. That energy-for-force trade is the standard result for ML potentials, and forces are what you want for dynamics.
 
 ## On the trajectory plots
 
