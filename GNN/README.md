@@ -7,7 +7,7 @@ Setup: 9 particles, 5 species, on a plane. Fully-connected graph, where nodes ar
 ## Models
 
 - `gcn.py`: GCN. Edge embedder maps each distance to a scalar weight, aggregate neighbor states weighted by that plus a self term, 4 layers, sum per-node energies.
-- `gat.py`: GAT. Attention over `[h_i, h_j, edge]` instead of fixed edge weights. The detail that matters: the message value carries the edge too (`transfer([h_j, edge])`), not just the attention weight. Without it the model can't route distance magnitude, since softmax normalizes it away, and it barely learns.
+- `gat.py`: GAT. Attention over `[h_i, h_j, edge]` instead of fixed edge weights. The message value carries the edge too (`transfer([h_j, edge])`), not just the attention weight. Without it the model can't route distance magnitude, since softmax normalizes it away, and it barely learns.
 - `gatv2.py`: same GAT, trained on energy + force (`MSE(E) + 4·MSE(F)`), forces from autograd with `create_graph=True`. Energy-only training gives good energy but mediocre forces, and forces are what the sim runs on.
 
 ## Results
@@ -24,4 +24,4 @@ Two clean wins: GAT beats GCN on forces by ~3.6x, and adding the force loss cuts
 
 ## On the trajectory plots
 
-Rolling the learned potential out and comparing paths (`*_results/`) is a bad way to rank models. The dynamics are chaotic, so any small force error blows up exponentially and every model's trajectory diverges at about the same rate regardless of quality. Force RMSE at fixed configs is the honest metric; the trajectory plots are mostly for show.
+Rolling the learned potential out and comparing paths (`*_results/`) is a bad way to rank models. The dynamics are chaotic, so any small force error blows up exponentially and every model's trajectory diverges at about the same rate regardless of quality. Force RMSE at fixed configs is the more significant metric in my opinion, but it's interesting to visualize the dynamics as well and see what happens. 
