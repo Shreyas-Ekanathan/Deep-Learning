@@ -5,7 +5,8 @@ import numpy as np
 from torchdiffeq import odeint
 import os
 
-HERE = os.path.dirname(os.path.abspath(__file__)) #resolve paths against this file, not the cwd
+HERE = os.path.dirname(os.path.abspath(__file__))
+device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
 
 #explore a neural ODE based design for learning nonlinaer dynamics
 
@@ -54,7 +55,7 @@ class NODE(nn.Module):
     def forward(self, x0, t):
         z0 = self.encoder(x0)
 
-        z_traj = odeint(self.ode_func, z0, t, rtol = 1e-3, atol = 1e-6) #solve the diffeq, integrate in latent space
+        z_traj = odeint(self.ode_func, z0, t, rtol = 1e-3, atol = 1e-6, options = {'dtype': torch.float32}) #solve the diffeq, integrate in latent space
         
         x_hat = self.decoder(z_traj.reshape(-1, *z0.shape[1:])) #output
         return x_hat.reshape(len(t), z0.shape[0], *x_hat.shape[1:]).transpose(0, 1) #fix batch first data
@@ -85,15 +86,17 @@ if __name__ == "__main__":
     runs = runs.unsqueeze(2) #add a channel dim
     sigma = runs.std()
     dataset = KolmogorovDataset(runs, 30, 10, 0.05, sigma)
-    train_loader = DataLoader(dataset, batch_size=32, shuffle=True)
+    train_loader = DataLoader(dataset, batch_size=64, shuffle=True)
 
     test_traj = torch.load(os.path.join(HERE, "kolmogorov_test_dataset.pt")) #2 eval trajectories
     test_traj = test_traj.unsqueeze(2) #add a channel dim
-    test_dataset = KolmogorovDataset(test_traj, 30, 10, 0.05, sigma)
-    test_loader = DataLoader(test_dataset, batch_size=32, shuffle=True)
+    test_dataset = KolmogorovDataset(test_traj, 30, 20, 0.05, sigma)
+    test_loader = DataLoader(test_dataset, batch_size=64, shuffle=True)
 
-    num_epochs = 50
-    model = NODE(1)
+    num_epochs = 75
+    model = NODE(1).to(device)
+    print(f"training on {device}")
+    t_grid = dataset.t.to(device)
 
     optimizer = torch.optim.Adam(model.parameters(), lr=0.001, weight_decay=1e-4)
     scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=num_epochs, eta_min=1e-5)
@@ -103,27 +106,29 @@ if __name__ == "__main__":
         model.train()
         avg_loss = 0
         for x0, traj, _ in train_loader:
-            predicted_traj = model(x0, dataset.t)
+            x0, traj = x0.to(device), traj.to(device)
+            predicted_traj = model(x0, t_grid)
             optimizer.zero_grad()
             loss = loss_func(predicted_traj, traj)
             avg_loss += loss.item()
             loss.backward()
             optimizer.step()
-        
+
         scheduler.step()
-    
+
         model.eval()
         with torch.no_grad():
             avg_test_loss = 0
             for x0, traj, _ in test_loader:
-                predicted_traj = model(x0, dataset.t)
+                x0, traj = x0.to(device), traj.to(device)
+                predicted_traj = model(x0, t_grid)
                 loss = loss_func(predicted_traj, traj)
                 avg_test_loss += loss.item()
             
             
         print(f"Epoch {epoch + 1}, Average train loss = {avg_loss / len(train_loader)}, Average test loss = {avg_test_loss / len(test_loader)}")
     
-        if (epoch % 10 == 0):
+        if (epoch % 15 == 0):
             torch.save(model.state_dict(), os.path.join(HERE, f"model_epoch_{epoch}.pth"))
     
     torch.save(model.state_dict(), os.path.join(HERE, f"model_epoch_{num_epochs}.pth"))

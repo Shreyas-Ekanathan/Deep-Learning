@@ -9,7 +9,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from matplotlib.colors import LinearSegmentedColormap
 
-from model import NODE, KolmogorovDataset, HERE
+from model import NODE, KolmogorovDataset, HERE, device
 
 #idea was mine, evaluation code writing itself was done by Claude
 
@@ -20,6 +20,8 @@ from model import NODE, KolmogorovDataset, HERE
 WINDOW = 30
 STRIDE = 10
 DT = 0.05
+
+BENCHMARKS = os.path.join(HERE, "benchmarks") #one subfolder per checkpoint
 
 #lags to show fields and spectra for: one inside the skilful range, one near the
 #ACC=0.6 crossover, one out where we expect the prediction to have gone smooth
@@ -65,26 +67,41 @@ def radial_spectrum(field):
     out.index_add_(-1, shell.flatten(), power.flatten(start_dim=-2))
     return out
 
-def latest_checkpoint():
+def get_checkpoints():
     paths = glob.glob(os.path.join(HERE, "model_epoch_*.pth"))
     if not paths:
         raise FileNotFoundError(f"no model_epoch_*.pth found in {HERE}")
-    return max(paths, key=lambda p: int(os.path.basename(p).split("_")[-1].split(".")[0]))
+        # return all checkpoints sorted by epoch number (ascending)
+    def _epoch_key(p):
+        return int(os.path.basename(p).split("_")[-1].split(".")[0])
+    return sorted(paths, key=_epoch_key)
+
+_EVAL_DATA = None
+
+def eval_data():
+    #the train tensor is ~1 GB and only supplies sigma and the climatology, so load it
+    #once and reuse it across every checkpoint in the sweep
+    global _EVAL_DATA
+    if _EVAL_DATA is None:
+        #sigma and the climatology both have to come from the train set, same as in training
+        train = torch.load(os.path.join(HERE, "kolmogorov_train_dataset.pt")).unsqueeze(2)
+        sigma = train.std()
+        climatology = (train / sigma).mean(dim=(0, 1)) #per pixel time mean, shape (1, N, N)
+        del train
+
+        test = torch.load(os.path.join(HERE, "kolmogorov_test_dataset.pt")).unsqueeze(2)
+        _EVAL_DATA = (KolmogorovDataset(test, WINDOW, STRIDE, DT, sigma), climatology)
+    return _EVAL_DATA
 
 def evaluate(ckpt_path):
-    #sigma and the climatology both have to come from the train set, same as in training
-    train = torch.load(os.path.join(HERE, "kolmogorov_train_dataset.pt")).unsqueeze(2)
-    sigma = train.std()
-    climatology = (train / sigma).mean(dim=(0, 1)) #per pixel time mean, shape (1, N, N)
-    del train
-
-    test = torch.load(os.path.join(HERE, "kolmogorov_test_dataset.pt")).unsqueeze(2)
-    dataset = KolmogorovDataset(test, WINDOW, STRIDE, DT, sigma)
+    dataset, climatology = eval_data()
     loader = DataLoader(dataset, batch_size=32)
 
-    model = NODE(1)
-    model.load_state_dict(torch.load(ckpt_path))
+    #map_location matters: a checkpoint trained on mps carries mps tensors
+    model = NODE(1).to(device)
+    model.load_state_dict(torch.load(ckpt_path, map_location=device))
     model.eval()
+    t_grid = dataset.t.to(device)
 
     #accumulate sums rather than per batch means so uneven batch sizes stay correctly weighted
     sq_model = torch.zeros(WINDOW)
@@ -102,7 +119,9 @@ def evaluate(ckpt_path):
 
     with torch.no_grad():
         for x0, traj, _ in loader:
-            pred = model(x0, dataset.t)
+            #run the model on the accelerator, then bring the prediction back: every
+            #statistic below (and the ffts in particular) is cheap and cpu-safe
+            pred = model(x0.to(device), t_grid).cpu()
             pers = traj[:, :1].expand_as(traj) #hold omega_0 for the whole window
             count += traj.shape[0] * traj[0, 0].numel()
             windows += traj.shape[0]
@@ -140,7 +159,7 @@ def evaluate(ckpt_path):
         "windows": windows,
     }
 
-def plot_curves(res, tag):
+def plot_curves(res, out_dir):
     #left: error against both trivial baselines. right: how far ahead the skill survives
     fig, (ax_mse, ax_acc) = plt.subplots(1, 2, figsize=(11, 4.2), facecolor=SURFACE)
     t = res["t"]
@@ -164,16 +183,17 @@ def plot_curves(res, tag):
     #single series, so the title names it and no legend box is needed
     ax_acc.plot(t, res["acc"], color=SERIES[0], linewidth=2, solid_capstyle="round")
     ax_acc.axhline(0.6, color=MUTED, linewidth=1, linestyle=(0, (4, 3)))
-    ax_acc.annotate("ACC = 0.6, the usual usefulness floor", (t[-1], 0.6),
-                    textcoords="offset points", xytext=(-4, 6), ha="right",
+    #label the threshold below the line at the left: the curve starts near 1.0 and only
+    #descends, so that corner is the one region it can never reach. above the line is
+    #exactly where it travels, and to the right is where it ends up once skill is lost
+    ax_acc.annotate("ACC = 0.6 usefulness floor", (t[0], 0.6),
+                    textcoords="offset points", xytext=(4, -14), ha="left", va="top",
                     color=MUTED, fontsize=8)
     below = (res["acc"] < 0.6).nonzero()
     if len(below):
         lag = int(below[0])
         ax_acc.plot([lag * DT], [res["acc"][lag]], marker="o", markersize=8,
                     color=SERIES[0], markeredgecolor=SURFACE, markeredgewidth=2)
-        ax_acc.annotate(f"horizon t = {lag * DT:.2f}", (lag * DT, res["acc"][lag]),
-                        textcoords="offset points", xytext=(8, 8), color=INK_2, fontsize=8)
     ax_acc.set_title("Anomaly correlation of the Neural ODE", color=INK, fontsize=11,
                      loc="left", pad=10)
     ax_acc.set_xlabel("lead time t", color=INK_2, fontsize=9)
@@ -182,12 +202,12 @@ def plot_curves(res, tag):
     style_axes(ax_acc)
 
     fig.tight_layout()
-    path = os.path.join(HERE, f"eval_curves_{tag}.png")
+    path = os.path.join(out_dir, "curves.png")
     fig.savefig(path, dpi=150, facecolor=SURFACE)
     plt.close(fig)
     return path
 
-def plot_fields(res, tag):
+def plot_fields(res, out_dir):
     #the qualitative check the scalars cannot give you: does the rollout still look
     #like turbulence at long lead times, or has it gone smooth?
     truth, pred = res["sample"]
@@ -222,14 +242,13 @@ def plot_fields(res, tag):
         bar.outline.set_visible(False)
         bar.ax.tick_params(colors=MUTED, labelsize=7, length=2, width=0.8)
 
-    fig.suptitle("Vorticity rollout against ground truth", color=INK, fontsize=12,
-                 x=0.02, ha="left")
-    path = os.path.join(HERE, f"eval_fields_{tag}.png")
+    fig.suptitle("Vorticity Rollout Against Ground Truth", color=INK, fontsize=12)
+    path = os.path.join(out_dir, "fields.png")
     fig.savefig(path, dpi=150, facecolor=SURFACE, bbox_inches="tight")
     plt.close(fig)
     return path
 
-def plot_spectra(res, tag):
+def plot_spectra(res, out_dir):
     #small multiples, two series each: if the prediction is blurring, its spectrum
     #falls away from the truth at high k while low k stays put
     lags = [l for l in SPECTRUM_LAGS if l < res["spec_true"].shape[0]]
@@ -252,8 +271,12 @@ def plot_spectra(res, tag):
         ax.axvline(4, color=MUTED, linewidth=1, linestyle=(0, (4, 3)))
         ax.set_ylim(floor * 0.5, None)
         if i == 0:
-            ax.annotate("k = 4, forcing scale", (4, ax.get_ylim()[1]),
-                        textcoords="offset points", xytext=(6, -12), color=MUTED, fontsize=8)
+            #the spectrum peaks at k=4, so anchor the label to the bottom of the axes
+            #instead: blended transform, data coords in x and axes fraction in y
+            ax.annotate("k = 4, forcing scale", xy=(4, 0.02),
+                        xycoords=ax.get_xaxis_transform(),
+                        xytext=(6, 0), textcoords="offset points",
+                        ha="left", va="bottom", color=MUTED, fontsize=8)
             ax.set_ylabel("enstrophy per shell", color=INK_2, fontsize=9)
             leg = ax.legend(frameon=False, fontsize=9, loc="lower left")
             for text in leg.get_texts():
@@ -262,10 +285,10 @@ def plot_spectra(res, tag):
         ax.set_xlabel("wavenumber k", color=INK_2, fontsize=9)
         style_axes(ax)
 
-    fig.suptitle("Enstrophy spectrum: is the prediction losing its small scales?",
-                 color=INK, fontsize=12, x=0.02, ha="left")
+    fig.suptitle("Enstrophy Spectrum: Is the Prediction Losing its Small Scales?",
+                 color=INK, fontsize=12)
     fig.tight_layout(rect=(0, 0, 1, 0.93))
-    path = os.path.join(HERE, f"eval_spectra_{tag}.png")
+    path = os.path.join(out_dir, "spectra.png")
     fig.savefig(path, dpi=150, facecolor=SURFACE)
     plt.close(fig)
     return path
@@ -276,36 +299,57 @@ def report(ckpt_path):
     mse_model, mse_pers, mse_clim, acc = (res["mse_model"], res["mse_pers"],
                                           res["mse_clim"], res["acc"])
 
-    print(f"checkpoint: {os.path.basename(ckpt_path)}")
-    print(f"eval windows: {res['windows']}, {len(t)} lags, dt = {DT}\n")
-    print(" lag     t     model    persist    clim     skill      ACC")
+    #benchmarks/epoch_40/, named off the checkpoint so a sweep never overwrites itself
+    tag = os.path.basename(ckpt_path).replace("model_", "").replace(".pth", "")
+    out_dir = os.path.join(BENCHMARKS, tag)
+    os.makedirs(out_dir, exist_ok=True)
+
+    #build the summary once, then both print it and keep it beside the figures
+    lines = [f"checkpoint: {os.path.basename(ckpt_path)}",
+             f"eval windows: {res['windows']}, {len(t)} lags, dt = {DT}",
+             "",
+             " lag     t     model    persist    clim     skill      ACC"]
     for i in range(len(t)):
         skill = mse_model[i] / mse_clim[i] #below 1 means better than predicting the mean field
-        print(f" {i:3d}  {t[i]:5.2f}   {mse_model[i]:7.4f}  {mse_pers[i]:7.4f}  "
-              f"{mse_clim[i]:7.4f}  {skill:7.3f}  {acc[i]:7.3f}")
+        lines.append(f" {i:3d}  {t[i]:5.2f}   {mse_model[i]:7.4f}  {mse_pers[i]:7.4f}  "
+                     f"{mse_clim[i]:7.4f}  {skill:7.3f}  {acc[i]:7.3f}")
 
-    print(f"\nwindow mean MSE: model {mse_model.mean():.4f}, "
-          f"persistence {mse_pers.mean():.4f}, climatology {mse_clim.mean():.4f}")
+    lines += ["", f"window mean MSE: model {mse_model.mean():.4f}, "
+                  f"persistence {mse_pers.mean():.4f}, climatology {mse_clim.mean():.4f}"]
 
     #the two horizons worth quoting: where the model stops beating the mean field, and
     #where the anomaly correlation drops through 0.6 (the usual usefulness threshold)
     lost = (mse_model >= mse_clim).nonzero()
     if len(lost):
-        print(f"beats climatology out to lag {int(lost[0]) - 1} (t = {(int(lost[0]) - 1) * DT:.2f})")
+        lines.append(f"beats climatology out to lag {int(lost[0]) - 1} (t = {(int(lost[0]) - 1) * DT:.2f})")
     else:
-        print(f"beats climatology across the whole window (through t = {t[-1]:.2f})")
+        lines.append(f"beats climatology across the whole window (through t = {t[-1]:.2f})")
 
     below = (acc < 0.6).nonzero()
     if len(below):
-        print(f"ACC drops below 0.6 at lag {int(below[0])} (t = {int(below[0]) * DT:.2f})")
+        lines.append(f"ACC drops below 0.6 at lag {int(below[0])} (t = {int(below[0]) * DT:.2f})")
     else:
-        print(f"ACC stays above 0.6 across the whole window (through t = {t[-1]:.2f})")
+        lines.append(f"ACC stays above 0.6 across the whole window (through t = {t[-1]:.2f})")
 
-    tag = os.path.basename(ckpt_path).replace("model_", "").replace(".pth", "")
+    summary = "\n".join(lines)
+    print(summary)
+    with open(os.path.join(out_dir, "summary.txt"), "w") as fh:
+        fh.write(summary + "\n")
+
+    #the same per lag numbers in a form you can plot across checkpoints later
+    with open(os.path.join(out_dir, "metrics.csv"), "w") as fh:
+        fh.write("lag,t,mse_model,mse_persistence,mse_climatology,skill,acc\n")
+        for i in range(len(t)):
+            fh.write(f"{i},{t[i]:.4f},{mse_model[i]:.6f},{mse_pers[i]:.6f},"
+                     f"{mse_clim[i]:.6f},{mse_model[i] / mse_clim[i]:.6f},{acc[i]:.6f}\n")
+
     print()
-    for path in (plot_curves(res, tag), plot_fields(res, tag), plot_spectra(res, tag)):
-        print(f"wrote {os.path.basename(path)}")
+    for path in (plot_curves(res, out_dir), plot_fields(res, out_dir), plot_spectra(res, out_dir)):
+        print(f"wrote {os.path.relpath(path, HERE)}")
+    print(f"wrote {os.path.relpath(out_dir, HERE)}/summary.txt and metrics.csv\n")
 
-report(latest_checkpoint())
+
+for checkpoint in get_checkpoints():
+    report(checkpoint)
 
 
