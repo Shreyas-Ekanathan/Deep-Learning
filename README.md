@@ -26,9 +26,9 @@ These are some more traditional projects that people exploring deep learning fol
 - **[Translation](translation/)**: English to Spanish seq2seq. GRU with Bahdanau attention, and a Transformer built from scratch (custom multi-head attention, not nn.Transformer). Attention heatmaps included.
 - **[VAE](VAE/)**: convolutional VAE and class-conditional VAE on CIFAR-10. Reparameterization, KL annealing, latent interpolation, t-SNE. See the readme.
 
-## Foundations (scratch, then PyTorch)
+## Foundations
 
-Each implemented from scratch in numpy first, then rebuilt in PyTorch. The goal of these projects was to understand the internals of these algorithms fully.
+Each project is implemented from scratch in numpy first, then rebuilt in PyTorch. The goal of these projects was to understand the internals of these algorithms fully.
 
 - **[linear regression](linear_regression/)**: normal equations and gradient descent.
 - **[MLP](MLP/)**: hand-derived backprop. The second version adds Adam, batchnorm, dropout, and L2 by hand on a spiral classifier.
