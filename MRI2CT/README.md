@@ -28,6 +28,8 @@ TransUNet wins. Being directly supervised on paired data with an explicit L1 tar
 
 The idea was to train disjoint VAEs and learn a mapping between latent spaces. The VAEs could not reconstruct the images well to begin with (the dataset is too sparse for the prior to learn). If the encoder does not capture the manifold, the MLP mapping does not matter. Gray blobs. Documented as a negative result.
 
+I intend to come back to this with a contrastive learning approach shortly, but I've wrapped this up for the time being here. 
+
 ## On diffusion
 
 Training loss converges cleanly (0.042 to 0.014 over 140 epochs). DDIM samples produce recognizable anatomy, correct shapes and positions, just softer than the supervised models. DDPM accumulates too much stochastic error with an imperfect noise predictor. DPM-Solver-2 underperforms DDIM here because the second-order correction amplifies errors when the model is not fully converged, and the dataset is too small to train it to that point.

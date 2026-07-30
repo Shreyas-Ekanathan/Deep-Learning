@@ -1,6 +1,6 @@
-# Kolmogorov Flow with Neural ODEs
+# Kolmogorov Flow with Neural ODEs, Part 1: Fixed `ν`
 
-Learn the dynamics of a chaotic 2D turbulent flow as a continuous-time latent ODE. Write a pseudospectral Navier-Stokes solver to generate ground truth, then train an encoder / latent neural ODE / decoder to predict the vorticity field forward in time, and benchmark it against the trivial baselines the way a weather model gets benchmarked.
+Learn the dynamics of a chaotic 2D turbulent flow as a continuous-time latent ODE. Write a pseudospectral Navier-Stokes solver to generate ground truth, then train an encoder / latent neural ODE / decoder to predict the vorticity field forward in time, and benchmark it against the trivial baselines the way a weather model gets benchmarked. In this section, we treat `ν` as a fixed parameter, the second part of this project is to see if the model can learn to adapt to varying `ν`.
 
 ## The flow (`kolmogorov_flow.py`)
 
