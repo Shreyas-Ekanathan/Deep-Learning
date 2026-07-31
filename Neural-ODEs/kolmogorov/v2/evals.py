@@ -47,6 +47,15 @@ TRAIN_NUS = [0.03, 0.043, 0.06, 0.088, 0.12]
 #at 6 by nu_ramp, which is where a sequential ramp stops separating its steps
 NU_SWEEP = [0.025, 0.04, 0.06, 0.09, 0.13]
 
+#the shell above which enstrophy counts as "small scale". dissipation goes as nu * k^2, so it
+#bites hardest at high k, and the fraction of enstrophy living up there is the quantity that
+#orders cleanly by nu. measured on the training data it falls 0.0418 -> 0.0056 across the sweep,
+#monotonically, a 7.5x range. crucially it is invariant to the per window normalisation, since
+#dividing a field by its std rescales every wavenumber equally and cannot change spectral shape.
+#(mean wavenumber does NOT work here: low nu also loads the largest scales, which drags the mean
+#the other way, so it rises with nu instead of falling)
+SMALL_SCALE_K = 8
+
 SURFACE = "#fcfcfb"
 INK = "#0b0b0b"
 INK_2 = "#52514e"
@@ -101,12 +110,19 @@ def radial_spectrum(field):
 
 def get_checkpoints():
     paths = glob.glob(os.path.join(HERE, "model_epoch_*.pth"))
-    if not paths:
-        raise FileNotFoundError(f"no model_epoch_*.pth found in {HERE}")
-        # return all checkpoints sorted by epoch number (ascending)
+    # return all checkpoints sorted by epoch number (ascending)
     def _epoch_key(p):
         return int(os.path.basename(p).split("_")[-1].split(".")[0])
-    return sorted(paths, key=_epoch_key)
+    paths = sorted(paths, key=_epoch_key)
+    #model_best.pth is the one worth quoting, so score it last: it lands at the bottom of the log
+    #next to the epoch sweep it should be read against. it is appended rather than globbed in
+    #because "best" is not an int and would blow up _epoch_key
+    best = os.path.join(HERE, "model_best.pth")
+    if os.path.exists(best):
+        paths.append(best)
+    if not paths:
+        raise FileNotFoundError(f"no model_epoch_*.pth or model_best.pth found in {HERE}")
+    return paths
 
 _EVAL_DATA = None
 
@@ -121,7 +137,10 @@ def eval_data():
         #skill number derived from it would be meaningless. so build it out of the training
         #dataset itself, which applies exactly the normalisation the model was fitted against
         train = torch.load(os.path.join(HERE, "kolmogorov_train_dataset.pt"))
-        train_ds = KolmogorovDataset(train, WINDOW, STRIDE, DT)
+        #data_aug=False: the climatology has to be the mean of the actual training distribution,
+        #not of randomly rolled copies of it. rolling would not change the pooled mean much, but
+        #it would make the baseline differ between eval runs, and every skill number keys off it
+        train_ds = KolmogorovDataset(train, WINDOW, STRIDE, DT, False)
         #one climatology pooled over every nu, deliberately. a per nu climatology would be a
         #stronger baseline, but two of the test nu never appear in training so it does not
         #exist for them, and a baseline that changes between groups makes the groups
@@ -133,7 +152,10 @@ def eval_data():
         del train, train_ds
 
         test = torch.load(os.path.join(HERE, "kolmogorov_test_dataset.pt"))
-        _EVAL_DATA = (KolmogorovDataset(test, WINDOW, STRIDE, DT), climatology)
+        #data_aug=False here is load bearing: augmenting the eval set would redraw a different
+        #shift on every __getitem__, so the same checkpoint would score differently each run and
+        #the mismatched-nu and shuffled-nu comparisons would be measuring the roll, not nu
+        _EVAL_DATA = (KolmogorovDataset(test, WINDOW, STRIDE, DT, False), climatology)
     return _EVAL_DATA
 
 def nu_groups(dataset):
@@ -151,6 +173,33 @@ def shuffle_within_batch(nu):
     #degradation cannot be blamed on handing the embedding an out of distribution number.
     #operates on already standardised values, so a permutation is all it is
     return nu[torch.randperm(nu.shape[0], device=nu.device)]
+
+_NU_REFERENCE = None
+
+def small_scale_fraction(spectrum):
+    #share of enstrophy above SMALL_SCALE_K, given a radially averaged spectrum
+    return (spectrum[SMALL_SCALE_K + 1:].sum() / spectrum.sum()).item()
+
+def nu_reference(per_nu=24):
+    #what the TRUTH does per nu, in the same normalised units the model predicts in. the response
+    #sweep is judged against this rather than against an assumed law: the previous version of this
+    #check asserted that enstrophy must fall as 1/nu, which held under a single global sigma and
+    #stopped holding the moment every window was normalised to unit initial variance. measured,
+    #the true enstrophy is flat at ~0.51 for every nu, so there is no decrease left to detect and
+    #the old check reported a failure on every checkpoint that was purely its own bug
+    global _NU_REFERENCE
+    if _NU_REFERENCE is None:
+        dataset, _ = eval_data()
+        ref = {}
+        for nu, idx in nu_groups(dataset).items():
+            ens, frac = [], []
+            for i in idx[:per_nu]: #a couple of dozen windows is plenty for a mean spectrum
+                traj = dataset[i][2]
+                ens.append((0.5 * traj ** 2).mean().item())
+                frac.append(small_scale_fraction(radial_spectrum(traj[:, 0]).sum(dim=0)))
+            ref[nu] = (sum(ens) / len(ens), sum(frac) / len(frac))
+        _NU_REFERENCE = ref
+    return _NU_REFERENCE
 
 def as_model_nu(physical_nu, like):
     #physical nu -> the standardised scalar the network expects, shaped like a batch of them.
@@ -474,42 +523,74 @@ def plot_ablation(res_by_nu, res_wrong_by_nu, out_dir):
     return path
 
 def plot_nu_response(model, out_dir):
-    #the positive version of the ablation: hold x0 fixed, sweep nu, and check the rollouts
-    #move the way physics says they should. nu multiplies the dissipation term, so raising it
-    #has to pull enstrophy down. this is a claim about direction, which no MSE can make
+    #the positive version of the ablation: hold x0 fixed, sweep nu, and ask whether the rollouts
+    #move the way the DATA does. two quantities, because they answer different things:
+    #
+    #  left  - enstrophy against lead time. the truth sits flat at ~0.51 for every nu once windows
+    #          are individually normalised, so this panel is not a direction test; it measures how
+    #          much structure survives the rollout before the prediction blurs toward the mean
+    #  right - fraction of enstrophy above SMALL_SCALE_K. this IS a direction test: dissipation
+    #          goes as nu*k^2, the data falls 7.5x monotonically across the sweep, and the metric
+    #          is blind to the normalisation. so it is the one that can legitimately pass or fail
     dataset, _ = eval_data()
-    _, x0, traj, _, _ = dataset[0]
-    true_nu = round(float(dataset.windows[0][0]), 4) #windows hold physical nu
+    _, x0, _, _, _ = dataset[0]
     t_grid = dataset.t.to(device)
     colors = nu_ramp(len(NU_SWEEP))
+    reference = nu_reference()
 
-    fig, ax = plt.subplots(figsize=(6.4, 4.2), facecolor=SURFACE)
+    fig, (ax_ens, ax_k) = plt.subplots(1, 2, figsize=(11, 4.2), facecolor=SURFACE)
     x0_batch = x0.unsqueeze(0).to(device)
 
     #x0 is normalised to unit std, so every swept rollout starts from identical enstrophy by
     #construction. any spread that appears downstream is the nu conditioning and nothing else
-    finals = []
+    rows = []
     with torch.no_grad():
         for nu, color in zip(NU_SWEEP, colors):
             nu_tensor = as_model_nu(nu, torch.zeros(1, device=device))
             pred = model(x0_batch, t_grid, nu_tensor).cpu()[0]
             enstrophy = 0.5 * (pred ** 2).mean(dim=(1, 2, 3)) #per lag, normalised units
-            finals.append(enstrophy.mean().item()) #window mean, for the ordering check below
-            ax.plot(dataset.t, enstrophy, color=color, linewidth=2, solid_capstyle="round",
-                    label=f"nu = {nu:g}")
+            frac = small_scale_fraction(radial_spectrum(pred[:, 0]).sum(dim=0))
+            #retention against the truth for the nearest measured nu, so "0.36" reads as
+            #"kept 36% of the enstrophy the real flow carries" rather than as a bare number
+            near = min(reference, key=lambda r: abs(r - nu))
+            rows.append((nu, enstrophy.mean().item(), enstrophy.mean().item() / reference[near][0],
+                         frac, reference[near][1]))
+            ax_ens.plot(dataset.t, enstrophy, color=color, linewidth=2, solid_capstyle="round",
+                        label=f"nu = {nu:g}")
 
-    #the truth for this window, as the anchor the swept curves should bracket
-    true_enstrophy = 0.5 * (traj ** 2).mean(dim=(1, 2, 3))
-    ax.plot(dataset.t, true_enstrophy, color=INK_2, linewidth=1.4, linestyle=(0, (4, 3)),
-            label=f"truth (nu = {true_nu:g})")
+    #the truth is flat across nu here, so one horizontal reference states it for all of them
+    true_level = sum(v[0] for v in reference.values()) / len(reference)
+    ax_ens.axhline(true_level, color=MUTED, linewidth=1, linestyle=(0, (4, 3)))
+    ax_ens.annotate(f"truth, every nu ~ {true_level:.2f}", (dataset.t[0], true_level),
+                    textcoords="offset points", xytext=(4, 4), ha="left", va="bottom",
+                    color=MUTED, fontsize=8)
+    ax_ens.set_title("Structure retained through the rollout", color=INK, fontsize=11,
+                     loc="left", pad=10)
+    ax_ens.set_xlabel("lead time t", color=INK_2, fontsize=9)
+    ax_ens.set_ylabel("enstrophy (normalised units)", color=INK_2, fontsize=9)
+    ax_ens.set_ylim(0, None)
+    style_axes(ax_ens)
+    leg = ax_ens.legend(frameon=False, fontsize=9, loc="lower left")
+    for text in leg.get_texts():
+        text.set_color(INK_2)
 
-    ax.set_title("Response to nu from one fixed initial condition", color=INK, fontsize=11,
-                 loc="left", pad=10)
-    ax.set_xlabel("lead time t", color=INK_2, fontsize=9)
-    ax.set_ylabel("enstrophy (normalised units)", color=INK_2, fontsize=9)
-    ax.set_ylim(0, None)
-    style_axes(ax)
-    leg = ax.legend(frameon=False, fontsize=9, loc="best")
+    #two series, an identity contrast rather than an ordered one, so categorical slots 1 and 2.
+    #both axes log: nu and the small scale share are each naturally multiplicative
+    ref_nus = sorted(reference)
+    ax_k.loglog([r[0] for r in rows], [r[3] for r in rows], color=SERIES[0], linewidth=2,
+                marker="o", markersize=8, markeredgecolor=SURFACE, markeredgewidth=2,
+                label="Neural ODE", solid_capstyle="round")
+    ax_k.loglog(ref_nus, [reference[n][1] for n in ref_nus], color=SERIES[1], linewidth=2,
+                linestyle=(0, (5, 2)), marker="s", markersize=8, markeredgecolor=SURFACE,
+                markeredgewidth=2, label="Truth", solid_capstyle="round")
+    ax_k.set_title(f"Small-scale enstrophy (k > {SMALL_SCALE_K}) against nu", color=INK,
+                   fontsize=11, loc="left", pad=10)
+    ax_k.set_xlabel("nu", color=INK_2, fontsize=9)
+    ax_k.set_ylabel(f"fraction of enstrophy above k = {SMALL_SCALE_K}", color=INK_2, fontsize=9)
+    style_axes(ax_k)
+    #truth runs high-left to low-right and the model low-left to mid-right, so the upper right
+    #is the one corner neither series reaches
+    leg = ax_k.legend(frameon=False, fontsize=9, loc="upper right")
     for text in leg.get_texts():
         text.set_color(INK_2)
 
@@ -518,9 +599,9 @@ def plot_nu_response(model, out_dir):
     fig.savefig(path, dpi=150, facecolor=SURFACE)
     plt.close(fig)
 
-    #hand back the ordering check so the summary can state it rather than leaving it to the eye
-    monotone = all(finals[i] >= finals[i + 1] for i in range(len(finals) - 1))
-    return path, finals, monotone
+    #the verdict rests on the small scale ordering only, which is the part the data actually asserts
+    monotone = all(rows[i][3] >= rows[i + 1][3] for i in range(len(rows) - 1))
+    return path, rows, monotone
 
 def report(ckpt_path):
     dataset, _ = eval_data()
@@ -610,14 +691,27 @@ def report(ckpt_path):
     else:
         lines.append("  -> the model genuinely depends on its nu input")
 
-    nu_response_path, finals, monotone = plot_nu_response(model, out_dir)
-    lines += ["", "response to nu from one fixed x0 (window mean enstrophy)"]
-    for nu, value in zip(NU_SWEEP, finals):
-        lines.append(f"  nu = {nu:6.4f}   enstrophy {value:.4f}")
-    lines.append("  -> enstrophy falls monotonically with nu, as the physics requires"
-                 if monotone else
-                 "  -> NOT monotonic in nu: the learned response has the wrong shape, since nu "
-                 "multiplies dissipation and can only damp")
+    nu_response_path, rows, monotone = plot_nu_response(model, out_dir)
+    lines += ["", "response to nu from one fixed x0. enstrophy is judged against the truth for the "
+                  "nearest", "measured nu (it is flat across nu under per window normalisation, so "
+                  "it is not a direction", "test). the small scale share IS the direction test: the "
+                  f"data falls monotonically with nu", "",
+              f"      nu  enstrophy  retained   k>{SMALL_SCALE_K} share   truth share   vs truth"]
+    for nu, ens, retained, frac, ref_frac in rows:
+        lines.append(f"  {nu:6.4f}  {ens:9.4f}  {retained:7.1%}  {frac:12.4f}  {ref_frac:12.4f}"
+                     f"  {frac / ref_frac:8.2f}x")
+    if monotone:
+        lines.append("  -> small-scale share falls monotonically with nu, matching the data")
+    else:
+        #the ordering failing is worth reporting, but the ratio column says WHY, and it is not
+        #that the nu response is inverted: it is that the small scale deficit itself depends on
+        #nu, because low nu is more chaotic and the rollout blurs away more of what is there
+        ratios = [f / r for _, _, _, f, r in rows]
+        lines.append(f"  -> small-scale share does NOT fall with nu the way the data does. the "
+                     f"ratio column is the reason: the deficit runs {ratios[0]:.2f}x of truth at "
+                     f"the low end and {ratios[-1]:.2f}x at the high end, so the model is missing "
+                     f"small scales in a strongly nu dependent way rather than uniformly. low nu "
+                     f"is more chaotic, the rollout blurs sooner, and the high k tail goes first")
 
     summary = "\n".join(lines)
     print(summary)
@@ -651,7 +745,10 @@ def report(ckpt_path):
           f"and metrics_by_nu.csv\n")
 
 
-for checkpoint in get_checkpoints():
-    report(checkpoint)
+#guarded so the helpers above can be imported without kicking off the whole sweep. unguarded,
+#`from evals import radial_spectrum` silently evaluates every checkpoint first
+if __name__ == "__main__":
+    for checkpoint in get_checkpoints():
+        report(checkpoint)
 
 

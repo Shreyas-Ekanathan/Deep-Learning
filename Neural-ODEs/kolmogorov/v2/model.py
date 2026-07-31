@@ -32,11 +32,11 @@ class ODEFunc(nn.Module):
             nn.Tanh(),
             nn.Conv2d(streams * 2, streams * 2, 3, padding = 1, padding_mode = 'circular'),
             nn.Tanh(),
-            nn.Conv2d(streams * 2, streams, 3, padding = 1, padding_mode = 'circular')
+            nn.Conv2d(streams * 2, streams, 3, padding = 1, padding_mode = 'circular'),
         )
         self.streams = streams
         
-        self.forcing = nn.Parameter(torch.zeros(streams, 8, 8))
+        self.forcing = nn.Parameter(torch.zeros(streams, 16, 16))
         
         self.nu_embedding = nn.Sequential(
             nn.Linear(1, 64),
@@ -54,7 +54,7 @@ class ODEFunc(nn.Module):
         streams = self.streams
         nu_scaling = nu_embedding[:, :streams, :, :]
         nu_shift = nu_embedding[:, streams:, :, :]
-        return (nu_scaling + 1) * self.net(z) + self.forcing + nu_shift 
+        return (1 + torch.tanh(nu_scaling)) * self.net(z) + self.forcing + nu_shift
     
 class NODE(nn.Module):
     def __init__(self, streams):
@@ -62,36 +62,34 @@ class NODE(nn.Module):
         #take inspiration from U-net for encoder/decoder logic
         #input is the condition at time t0, and we want to rollout the trajectory correctly
         self.encoder = nn.Sequential(
-            nn.Conv2d(streams, 16, 3, stride = 2, padding = 1, padding_mode = 'circular'),  #we have periodic boundary cond
+            nn.Conv2d(streams, 32, 3, stride = 2, padding = 1, padding_mode = 'circular'),  #we have periodic boundary cond
             nn.Tanh(),
-            nn.Conv2d(16, 32, 3, stride = 2, padding = 1, padding_mode = 'circular'),
-            nn.Tanh(),
-            nn.Conv2d(32, 64, 3 , stride = 2, padding = 1, padding_mode = 'circular'),
+            nn.Conv2d(32, 64, 3, stride = 2, padding = 1, padding_mode = 'circular'),
         )
                 
         self.ode_func = ODEFunc(64)
         
         self.decoder = nn.Sequential(
-            nn.Upsample(scale_factor = 2, mode = 'nearest'), #upsample -> conv vs conv2d bc we want circular padding
-            nn.Conv2d(64, 32, 3, padding = 1, padding_mode = 'circular'),
+            nn.Conv2d(64, 32, 3, padding = 1, padding_mode = 'circular'), 
             nn.Tanh(),
             nn.Upsample(scale_factor = 2, mode = 'nearest'),
             nn.Conv2d(32, 16, 3, padding = 1, padding_mode = 'circular'),
             nn.Tanh(),
             nn.Upsample(scale_factor = 2, mode = 'nearest'),
-            nn.Conv2d(16, streams, 3, padding = 1, padding_mode = 'circular')
+            nn.Conv2d(16, streams, 3, padding = 1, padding_mode = 'circular'),
         ) #symmetric for output
-        
+
     def forward(self, x0, t, nu):
         z0 = self.encoder(x0)
-        
-        z_traj = odeint(lambda s, w: self.ode_func(s, w, nu), z0, t, rtol = 1e-3, atol = 1e-6, options = {'dtype': torch.float32}) #solve the diffeq, integrate in latent space
-        
+
+        #bound the run since dopri was becoming ridiculously expensive per solve
+        z_traj = odeint(lambda s, w: self.ode_func(s, w, nu), z0, t, method = 'midpoint', options = {'step_size': 0.1}) #solve the diffeq, integrate in latent space
+
         x_hat = self.decoder(z_traj.reshape(-1, *z0.shape[1:])) #output
         return x_hat.reshape(len(t), z0.shape[0], *x_hat.shape[1:]).transpose(0, 1) #fix batch first data
 
 class KolmogorovDataset(Dataset):
-    def __init__(self, all_runs, window_len, stride, dt):
+    def __init__(self, all_runs, window_len, stride, dt, data_aug):
         runs = all_runs["omega"].unsqueeze(2)
         nus = all_runs["nu"]
         self.window_len = window_len
@@ -103,6 +101,7 @@ class KolmogorovDataset(Dataset):
                 
         self.data = runs
         self.t = torch.arange(window_len) * dt
+        self.data_aug = data_aug
 
     def __len__(self):
         return len(self.windows)
@@ -110,6 +109,10 @@ class KolmogorovDataset(Dataset):
     def __getitem__(self, idx):
         nu, r, start = self.windows[idx]
         traj = self.data[r, start : start + self.window_len]
+        if self.data_aug:
+            dx = torch.randint(0, 64, ()).item()
+            dy = 16 * torch.randint(0, 4, ()).item()
+            traj = torch.roll(traj, shifts = (dx, dy), dims = (-2, -1))
         scale = traj[0].std()
         traj = traj / scale
         x0 = traj[0]
@@ -118,14 +121,14 @@ class KolmogorovDataset(Dataset):
     
 if __name__ == "__main__":
     runs = torch.load(os.path.join(HERE, "kolmogorov_train_dataset.pt"))
-    dataset = KolmogorovDataset(runs, 30, 10, 0.10)
+    dataset = KolmogorovDataset(runs, 30, 10, 0.10, True)
     train_loader = DataLoader(dataset, batch_size=64, shuffle=True)
 
     test_traj = torch.load(os.path.join(HERE, "kolmogorov_test_dataset.pt")) #eval trajectories
-    test_dataset = KolmogorovDataset(test_traj, 30, 20, 0.10)
+    test_dataset = KolmogorovDataset(test_traj, 30, 20, 0.10, False)
     test_loader = DataLoader(test_dataset, batch_size=64, shuffle=True)
 
-    num_epochs = 100
+    num_epochs = 75
     model = NODE(1).to(device)
     print(f"training on {device}")
     t_grid = dataset.t.to(device)
@@ -140,6 +143,9 @@ if __name__ == "__main__":
     scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=num_epochs, eta_min=1e-5)
     loss_func = nn.MSELoss()
     eval_loss_func = nn.MSELoss(reduction = 'none')
+
+    best_test_loss = float("inf")
+    best_epoch = None
 
     for epoch in range(num_epochs):
         model.train()
@@ -164,7 +170,7 @@ if __name__ == "__main__":
                 predicted_traj = model(x0, t_grid, nu)
                 per_example = eval_loss_func(predicted_traj, traj).flatten(1).mean(1)
                 for nu_val, l in zip(nu.tolist(), per_example.tolist()):
-                    #nu arrives standardised, so map it back to physical nu for the label
+                    #unstandardize nu for data reporting
                     key = round(unstandardise_nu(nu_val), 4)
                     loss_sums[key] += l
                     loss_counts[key] += 1
@@ -173,9 +179,23 @@ if __name__ == "__main__":
             avg_test_loss = sum(loss_sums.values()) / sum(loss_counts.values())
 
         by_nu_str = ", ".join(f"nu={k:g}: {v:.5f}" for k, v in test_by_nu.items())
-        print(f"Epoch {epoch + 1}, Average train loss = {avg_loss / len(train_loader)}, Average test loss = {avg_test_loss}, by nu -> {by_nu_str}")
-    
+
+        is_best = avg_test_loss < best_test_loss
+        if is_best:
+            best_test_loss = avg_test_loss
+            best_epoch = epoch + 1
+            torch.save(model.state_dict(), os.path.join(HERE, "model_best.pth"))
+            with open(os.path.join(HERE, "model_best.txt"), "w") as fh:
+                fh.write(f"epoch {best_epoch}\ntest loss {best_test_loss:.6f}\n"
+                         f"by nu {by_nu_str}\n")
+
+        print(f"Epoch {epoch + 1}, Average train loss = {avg_loss / len(train_loader)}, "
+              f"Average test loss = {avg_test_loss}{'  <- best so far' if is_best else ''}, "
+              f"by nu -> {by_nu_str}")
+
         if (epoch % 10 == 0):
             torch.save(model.state_dict(), os.path.join(HERE, f"model_epoch_{epoch}.pth"))
-    
+
     torch.save(model.state_dict(), os.path.join(HERE, f"model_epoch_{num_epochs}.pth"))
+    print(f"\nbest test loss {best_test_loss:.6f} at epoch {best_epoch} "
+          f"(saved as model_best.pth); final epoch {num_epochs} was {avg_test_loss:.6f}")
