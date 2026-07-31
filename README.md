@@ -4,9 +4,7 @@ The goal of this work was to explore the trajectory of deep learning in depth (g
 
 This is a portfolio built from the ground up, as I started learning ML in the summer of 2026. This repo was started in May 2026, and has been growing ever since.
 
-The foundational architectures are each implemented twice: once from scratch in numpy with hand-derived backprop, then again in PyTorch. 
-
-The larger projects build on that toward applied and research-adjacent work. I plan on continuing to develop and enhance the projects here. 
+The foundational architectures are each implemented twice: once from scratch in numpy with hand-derived backprop, then again in PyTorch. The larger projects build on that toward applied and research-adjacent work. I plan on continuing to develop and enhance the projects here. 
 
 **On AI:** All of the models and training were done by me. The only places that AI helped in this work were 1) in generating evaluation scripts, since modern coding agents are good at this and it has somewhat less learning value for me, and 2) in debugging, both with respect to bugs and some model failures. When this was done, I made sure that I understood all of the work, and heavily AI-written bodies of code are cited as such. It is ironic that a repo trying to learn how frontier AI works makes sparing use of it, but as Feynman said, "What I cannot create, I do not understand," hence the existence of this whole repo. 
 
