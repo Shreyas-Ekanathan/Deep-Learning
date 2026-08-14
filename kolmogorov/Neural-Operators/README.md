@@ -10,7 +10,7 @@ The short answers are no and yes. The FNO loses the pooled MSE comparison by abo
 - **Four Fourier layers**, 16 → 16 channels, keeping 12 modes per axis.
 - **Projection**: 1x1 convolutions 16 → 64 → 1 with a GELU between.
 
-954,209 parameters — 589,824 spectral, 262,144 in the learned forcing fields, 99,968 across the four `ν` embedders, and 2,273 in the pointwise convolutions. Against Part 2's 403,329 that is 2.4x larger, which is worth holding in mind when reading the comparison.
+954,209 parameters, with 589,824 spectral, 262,144 in the learned forcing fields, 99,968 across the four `ν` embedders, and 2,273 in the pointwise convolutions. Against Part 2's 403,329 that is 2.4x larger, which is worth holding in mind when reading the comparison.
 
 There is no encoder and no downsampling. Part 2 shrank to a 16x16 latent because `odeint` had to be affordable; there is no integrator here and nothing to make affordable, and the mode truncation already does the job a stride-2 encoder was doing.
 
@@ -22,15 +22,15 @@ The layer is a learned version of what the solver already does. Part 1's solver 
 torch.einsum('bixy,ioxy->boxy', block, torch.view_as_complex(weights))
 ```
 
-The channel index is contracted; the two frequency indices ride along untouched, because mode `k` never talks to mode `k'`. The weights must be complex, not real, as a real multiplier can only rescale a mode's amplitude, which buys damping like `-νk²ω̂` but never transport, and phase rotation in Fourier space is translation in physical space. The solver's own `1j·KX` could not be represented by a real weight.
+The channel index is contracted; the two frequency indices ride along untouched, since mode `k` never talks to mode `k'`. Note that the weights must be complex, not real, as a real multiplier can only rescale a mode's amplitude, which buys damping like `-νk²ω̂` but never transport, and phase rotation in Fourier space is translation in physical space. The solver's own `1j·KX` could not be represented by a real weight.
 
-Running in parallel is a 1x1 convolution on the input. Truncation makes the spectral path blind above `k = 11`, and the pointwise path is the only route by which anything above the cutoff survives. The two are summed and then activated, so the composition is `σ(K(x) + W(x))`.
+Running in parallel is a 1x1 convolution on the input. Truncation makes the spectral path blind above `k = 11`, so the pointwise path is the only route by which anything above the cutoff survives. The two are summed and then activated, giving `σ(K(x) + W(x))`.
 
 That split is the same one the solver makes: linear operations where they are diagonal (Fourier), nonlinear operations where products are cheap (physical). A pseudospectral step, learned.
 
 ### The forcing
 
-Part 2's learned spatial forcing field is kept, one per layer, and for the same reason as everything else here: changing the forcing mechanism and the dynamics core at once would confound the comparison. A pure FNO is exactly translation-equivariant — spectral convolutions and pointwise operations both commute with a circular shift — and so structurally cannot represent the `y`-dependent drive without something to break the symmetry.
+We keep Part 2's learned spatial forcing field, one per layer, and for the same reason as everything else here: changing the forcing mechanism and the dynamics core at once would confound the comparison. A pure FNO is exactly translation-equivariant, since spectral convolutions and pointwise operations both commute with a circular shift, so it structurally cannot represent the `y`-dependent drive without something to break the symmetry.
 
 This is also the one part of the model defined per pixel rather than per wavenumber, and the only part that does not transfer across grids for free.
 
@@ -44,7 +44,7 @@ Note that each rollout step is wrapped in `torch.utils.checkpoint`. Storing acti
 
 Ported from Part 2 and unchanged in substance: per-lag MSE against climatology and persistence, anomaly correlation, vorticity montages, enstrophy spectra, per-`ν` scoring with seen/unseen marked, the shuffled-`ν` ablation, and the `ν` response sweep.
 
-One thing does not carry over. Part 2's lag 0 was `decoder(encoder(x0))` and cost 0.0185 MSE — the autoencoder reconstruction floor under everything else. The FNO works in physical space and seeds its rollout with `x0` itself, so lag 0 is exactly 0 MSE and exactly 1.0 ACC. That is an architectural difference rather than a result, and the lag 0 row is not comparable between the two parts.
+One thing does not carry over. Part 2's lag 0 was `decoder(encoder(x0))` and cost 0.0185 MSE, the autoencoder reconstruction floor under everything else. The FNO works in physical space and seeds its rollout with `x0` itself, so lag 0 is exactly 0 MSE and exactly 1.0 ACC. That is an architectural difference rather than a result, and the lag 0 row is not comparable between the two parts.
 
 Added for Part 3 is `report_transfer`, which scores the same checkpoint at 64x64 and at 128x128 through the same code path. The learned forcing is moved onto the finer grid by zero-padding its spectrum, which is exact rather than approximate for a band-limited field, as it preserves the field's rms to four decimals.
 
@@ -81,15 +81,15 @@ It beats climatology at every lead time and holds `ACC ≥ 0.6` out to `t = 2.30
 | 0.095 | no | 0.466 | 0.425 | 0.726 | +49.4% |
 | 0.15 | no | 0.055 | 0.060 | 0.972 | +992.5% |
 
-The neural ODE wins on four of five viscosities and on the pooled number, 0.4546 against 0.4758 — roughly 5%, with 42% of the parameters. The FNO's only win is `ν = 0.15`, the most laminar and least chaotic case.
+The neural ODE wins on four of five viscosities and on the pooled number, 0.4546 against 0.4758, so roughly 5% with 42% of the parameters. The FNO's only win is `ν = 0.15`, the most laminar and least chaotic case.
 
-That result is more interesting than it looks, because an earlier checkpoint scored per lead time showed the two models crossing: the FNO was the better short-horizon operator and the worse long-horizon one, with the crossover near `t ≈ 1.0`. Part 2 trained against 30-frame windows and therefore optimised long-rollout MSE directly, and past the predictability horizon the MSE-minimising forecast is the smooth conditional mean. 
+That result is more interesting than it looks, since an earlier checkpoint scored per lead time showed the two models crossing: the FNO was the better short-horizon operator and the worse long-horizon one, with the crossover near `t ≈ 1.0`. Part 2 trained against 30-frame windows and therefore optimised long-rollout MSE directly, and past the predictability horizon the MSE-minimising forecast is the smooth conditional mean.
 
 Conditioning, on the other hand, is unambiguously stronger. Shuffling `ν` across the test set costs +42.3% against Part 2's +36%, and the mismatched-`ν` penalties on the chaotic groups run 74–123% where Part 2 saw 56–73%. Measured directly, the output difference between `ν = 0.025` and `ν = 0.15` on identical input grows from 1.6% at initialisation to 129% at convergence.
 
 ### Resolution transfer
 
-This is the experiment Part 2 cannot enter. A stride-2 convolution is defined in grid cells, so the neural ODE is welded to the resolution it was trained on, but a spectral weight is indexed by wavenumber, and wavenumber 3 means "three oscillations across the box" on any grid. Nothing in the model is indexed by cell offset, so the same weights can be evaluated on a finer sampling of the same field as we do. 
+This is the experiment Part 2 cannot enter. A stride-2 convolution is defined in grid cells, so the neural ODE is welded to the resolution it was trained on, but a spectral weight is indexed by wavenumber, and wavenumber 3 means "three oscillations across the box" on any grid. Nothing in the model is indexed by cell offset, so the same weights can be evaluated on a finer sampling of the same field as we do.
 
 | t | 64x64 skill | 128x128 skill | 64x64 ACC | 128x128 ACC |
 |---|---|---|---|---|
@@ -116,7 +116,7 @@ Part 2 handed the network a free per-pixel field and let it fit whatever it want
 
 Every layer's dominant peak is at `(kx=0, ky=4)`, which is exactly `cos(4y)`, with the second at `(0, 8)`, the harmonic the nonlinearity generates from it. The first layer puts 88.8% of its power at `kx = 0`, having discovered that the forcing is `x`-independent.
 
-The symmetry augmentation is what makes this possible: random `x` rolls make any `kx ≠ 0` forcing inconsistent across samples, and 16-cell `y` rolls admit only `ky ∈ 4ℤ`. Those shifts are redundant for a pure FNO, which is already exactly equivariant, but become load bearing the moment a free spatial field is introduced. The concentration decays with depth, so the deeper layers are fitting structure the physics does not have.
+The symmetry augmentation is what makes this possible: random `x` rolls make any `kx ≠ 0` forcing inconsistent across samples, and 16-cell `y` rolls admit only `ky ∈ 4ℤ`. Note that those shifts are redundant for a pure FNO, which is already exactly equivariant, but they start mattering the moment a free spatial field is introduced. The concentration decays with depth, so the deeper layers are fitting structure the physics does not have.
 
 ### Where it fails
 
@@ -135,7 +135,7 @@ The `ν` response sweep shows the same thing with a sharper edge than Part 2 man
 |---|---|---|---|---|---|
 | vs truth | 0.15x | 0.17x | 0.24x | 0.45x | 1.83x |
 
-The deficit is not uniform, it is strongly `ν`-dependent — the model retains 15% of the small-scale enstrophy at the most turbulent viscosity and overshoots by 1.83x at the most laminar. It blurs hardest exactly where the flow is most chaotic, which is where the small scales carry the most information.
+The deficit is not uniform, it is strongly `ν`-dependent, since the model retains 15% of the small-scale enstrophy at the most turbulent viscosity and overshoots by 1.83x at the most laminar. It blurs hardest exactly where the flow is most chaotic, which is where the small scales carry the most information.
 
 This is not an architectural limit. Lag 0 is exact, the spectral layers can represent `k ≤ 11` perfectly well, and the resolution transfer shows the machinery handles finer grids without complaint. It is what minimising mean squared error over a chaotic rollout asks for. Fixing it needs a different objective, for example a spectral term in the loss, or a denoising formulation like PDE-Refiner, which is Part 4.
 
