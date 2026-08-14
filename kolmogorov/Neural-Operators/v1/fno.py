@@ -7,6 +7,7 @@ from collections import defaultdict
 import os
 import torch.fft as fourier
 import torch.nn.functional as F
+from torch.utils.checkpoint import checkpoint
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
@@ -67,12 +68,13 @@ class FNO(nn.Module):
     def __init__(self, streams, grid):
         super().__init__()
         #same encoder/decoder logic for FNO, but no neuralode, instead linear transforms
-        self.encoder = nn.Conv2d(streams, 16, 1, stride = 1)  
-        
+        self.encoder = nn.Conv2d(streams, 16, 1, stride = 1)
+
         self.fourier = nn.ModuleList([
-            Fourier_Layer(16, 16, 16, 16, grid),
-            Fourier_Layer(16, 16, 16, 16, grid),
-            Fourier_Layer(16, 16, 16, 16, grid)
+            Fourier_Layer(16, 16, 12, 12, grid),
+            Fourier_Layer(16, 16, 12, 12, grid),
+            Fourier_Layer(16, 16, 12, 12, grid),
+            Fourier_Layer(16, 16, 12, 12, grid)
         ])
                         
         self.decoder = nn.Sequential(
@@ -81,14 +83,21 @@ class FNO(nn.Module):
             nn.Conv2d(64, streams, 1)
         )
 
+    def step(self, x, nu):
+        #one dt = 0.1 step of the learned operator, predicting the increment
+        out = self.encoder(x)
+        for layer in self.fourier:
+            out = layer(out, nu)
+        out = self.decoder(out)
+        return x + out
+
     def forward(self, x0, t, nu):
         rollout = [x0]
         for i in range(len(t) - 1): #learn to take steps of 0.1
-            out = self.encoder(x0)
-            for layer in self.fourier: 
-                out = layer(out, nu)
-            out = self.decoder(out)
-            x0 = x0 + out
+            if self.training:
+                x0 = checkpoint(self.step, x0, nu, use_reentrant = False)
+            else:
+                x0 = self.step(x0, nu)
             rollout.append(x0)
         return torch.stack(rollout, dim=1)
 
@@ -137,14 +146,14 @@ class KolmogorovDataset(Dataset):
     
 if __name__ == "__main__":
     runs = torch.load(os.path.join(HERE, "kolmogorov_train_dataset.pt"))
-    dataset = KolmogorovDataset(runs, 30, 10, 0.10, True)
+    dataset = KolmogorovDataset(runs, 30, 5, 0.10, True)
     train_loader = DataLoader(dataset, batch_size=64, shuffle=True)
 
     test_traj = torch.load(os.path.join(HERE, "kolmogorov_test_dataset.pt")) #eval trajectories
     test_dataset = KolmogorovDataset(test_traj, 30, 20, 0.10, False)
     test_loader = DataLoader(test_dataset, batch_size=64, shuffle=True)
 
-    num_epochs = 75
+    num_epochs = 50
     model = FNO(1, 64).to(device)
     print(f"training on {device}")
     t_grid = dataset.t.to(device)
