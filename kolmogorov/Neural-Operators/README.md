@@ -139,4 +139,86 @@ The deficit is not uniform, it is strongly `ν`-dependent, since the model retai
 
 This is not an architectural limit. Lag 0 is exact, the spectral layers can represent `k ≤ 11` perfectly well, and the resolution transfer shows the machinery handles finer grids without complaint. It is what minimising mean squared error over a chaotic rollout asks for. Fixing it needs a different objective, for example a spectral term in the loss, or a denoising formulation like PDE-Refiner, which is Part 4.
 
-# To Come: PDE Refiner...
+# Part 4: PDE-Refiner (`v2/pde_refiner.py`)
+
+In part 3, the spectral weights above `k = 8` decay toward zero
+because 29-step MSE gives no reason to model scales that are unpredictable past `t ~ 1.5`, so the
+forecast hedges and the hedge is a blur. PDE-Refiner (Lippe et al., 2023) is built to fix exactly
+that, by treating one timestep as a short reversed-schedule diffusion process.
+
+One network, conditioned on a refinement level `k`. At `k = 0` it predicts the next state directly;
+at `k >= 1` it does epsilon-prediction on a noised estimate, with `sigma_k = sigma_min^(k/K)` falling
+from 1 to 0.001 over `K = 4` levels. Inference costs `K + 1` passes per step. The point is scale
+normalisation: epsilon-prediction has a unit-variance target at every level, so the fine levels
+produce gradients the same size as the coarse ones and the network is forced to resolve the
+low-amplitude high-`k` content that plain MSE ignores.
+
+Against Part 3 the encoder takes two channels, `nu` and `k` share one conditioning MLP instead of
+two composed FiLM layers, and the residual `x + step(x)` survives only on the `k = 0` branch, since
+at `k >= 1` the output is noise rather than a field. 956,313 parameters against 954,209.
+
+## What worked
+
+Not the refinement chain, which is the main finding and comes below. Three other things did:
+
+| | pooled MSE |
+|---|---|
+| PDE-Refiner as published, no residual | 0.7833 |
+| + residual on `k = 0`, 65% of samples at `k = 0` | 0.7004 |
+| + 8-step rollout fine-tuning with a spectral loss | 0.5008 |
+
+Single-step teacher forcing is what breaks. The one-step error is small but compounds
+geometrically, and the rollout passes the no-skill level by `t = 2.0`. Unrolling eight steps and
+training through them attacks the amplification factor directly, which is what Part 3 got for
+free from its 29-step BPTT and what this restructure had quietly given up.
+
+## Results
+
+Against Part 3 on the same 350 test windows, scored on pooled MSE and on log-space error in the
+shell-averaged enstrophy spectrum:
+
+| model | pooled MSE | spectral error |
+|---|---|---|
+| Part 3 FNO | **0.4747** | 3.5704 |
+| Part 4, `K = 0` | 0.5008 | **0.5049** |
+
+5.5% worse on MSE, 7.1x better on the spectrum. Part 3 said it was buying its MSE with blur;
+this is that bill, itemised. And the two cross as the horizon grows:
+
+| t | 0.5 | 1.0 | 1.5 | 2.0 | 2.9 |
+|---|---|---|---|---|---|
+| Part 3 | 0.3262 | 0.3965 | 0.4891 | 0.5840 | **0.7102** |
+| Part 4 | **0.0983** | **0.2501** | 0.5306 | 0.7737 | 1.0384 |
+
+3.3x better at `t = 0.5`, 1.5x worse at `t = 2.9`, crossing near `t ~ 1.3`. Parts 2 and 3 sat on
+opposite ends of this same axis by accident; here it was walked on purpose. Train against long
+rollouts and you get a smooth hedge that wins pooled MSE. Train against short ones with a
+spectral penalty and you get a sharp forecast that decorrelates sooner.
+
+## The refinement chain does nothing
+
+Across three regimes, `K = 4` never beat `K = 0`:
+
+| | `K = 0` | `K = 4` |
+|---|---|---|
+| no residual, uniform `k` | 0.7374 | 0.7378 |
+| residual + skew, denoisers untrained during fine-tuning | 0.5948 | 0.9622 |
+| residual + skew, denoisers maintained | 0.5008 | 0.5225 |
+
+The obvious suspect is a mis-scaled schedule, and at first that was real: the one-step error was
+0.217 against `sigma_1 = 0.178`, so every level sat below the error it was supposed to fix. After
+the residual and the resampling the one-step error fell to about 0.14, the ladder straddled it,
+and nothing changed.
+
+What is left is that the two errors are not the same kind of thing. The denoiser learns to strip
+white noise off a clean field. The base model's error is a smooth, physically plausible field
+error. Spectral separation catches the first and slides straight past the second, so the chain
+removes exactly the noise it injected and hands back what it started with.
+
+The denoisers still have to be kept trained even though nothing uses them. Fine-tuning at `K = 0`
+alone leaves them calibrated to a base predictor that has moved out from under them, and `K = 4`
+goes from harmless to harmful, 0.5948 to 0.9622. Mixing a single-step refiner loss back into the
+fine-tune holds the penalty to 0.5008 against 0.5225.
+
+The refinement chain contributes nothing here, while
+the spectral loss it was meant to replace recovers the small scales on its own.
